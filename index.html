@@ -6,134 +6,112 @@
 <title>VALERIN</title>
 
 <style>
-body { margin:0; font-family:Arial; background:black; color:white; }
+body {
+  margin: 0;
+  background: black;
+  color: white;
+  font-family: Arial;
+}
 
+/* 🔥 Splash screen */
+#splash {
+  position: fixed;
+  width: 100%;
+  height: 100vh;
+  background: black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+/* Logo animation */
+#logo {
+  width: 140px;
+  animation: rotateLogo 2s ease;
+}
+
+@keyframes rotateLogo {
+  0% {
+    transform: rotate(0deg) scale(0.5);
+    opacity: 0;
+  }
+  100% {
+    transform: rotate(360deg) scale(1);
+    opacity: 1;
+  }
+}
+
+/* Main hidden initially */
+#main {
+  display: none;
+}
+
+/* Navbar */
 .navbar {
-  display:flex; justify-content:space-between; padding:20px;
-  border-bottom:1px solid #222;
+  display: flex;
+  justify-content: space-between;
+  padding: 20px 40px;
+  border-bottom: 1px solid #222;
 }
 
-.nav-links a { margin:0 10px; color:white; text-decoration:none; }
-
-.btn { background:gold; color:black; padding:10px 20px; cursor:pointer; }
-
-.product {
-  border:1px solid #333; padding:20px; text-align:center;
+.nav-links a {
+  margin: 0 10px;
+  text-decoration: none;
+  color: white;
 }
 
-.grid {
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
-  gap:20px;
-  padding:40px;
+.cart {
+  border: 1px solid gold;
+  padding: 5px 10px;
 }
 
-.modal {
-  position:fixed; top:0; left:0; width:100%; height:100%;
-  background:rgba(0,0,0,0.8);
-  display:none; justify-content:center; align-items:center;
+/* Hero */
+.hero {
+  text-align: center;
+  padding: 120px 20px;
 }
 
-.modal-box {
-  background:#111; padding:30px; border:1px solid gold;
+.hero h1 {
+  font-size: 60px;
 }
 
-input {
-  display:block; margin:10px 0; padding:10px; width:200px;
-}
 </style>
 </head>
 
 <body>
 
+<!-- 🔥 Splash -->
+<div id="splash">
+  <img src="logo.png" id="logo">
+</div>
+
+<!-- 🔥 Main site -->
+<div id="main">
+
 <div class="navbar">
   <div>VALERIN</div>
+
   <div class="nav-links">
     <a href="#">MEN</a>
     <a href="#">WOMEN</a>
     <a href="#">UNISEX</a>
   </div>
-  <div>
-    <span id="userBtn" onclick="openAuth()">Login</span>
-    |
-    <span onclick="openCart()">Cart (<span id="cartCount">0</span>)</span>
-  </div>
+
+  <div class="cart">Cart</div>
 </div>
 
-<h1 style="text-align:center;">Luxury Watches</h1>
-
-<div class="grid">
-  <div class="product">
-    Watch 1<br>₹5000<br>
-    <button class="btn" onclick="addToCart('Watch 1')">Add to Cart</button>
-  </div>
-  <div class="product">
-    Watch 2<br>₹7000<br>
-    <button class="btn" onclick="addToCart('Watch 2')">Add to Cart</button>
-  </div>
+<div class="hero">
+  <h1>Luxury Watches</h1>
 </div>
 
-<!-- AUTH MODAL -->
-<div class="modal" id="authModal">
-  <div class="modal-box">
-    <h3>Login / Signup</h3>
-    <input id="email" placeholder="Email">
-    <input id="phone" placeholder="Phone">
-    <button class="btn" onclick="login()">Submit</button>
-  </div>
-</div>
-
-<!-- CART MODAL -->
-<div class="modal" id="cartModal">
-  <div class="modal-box">
-    <h3>Your Cart</h3>
-    <div id="cartItems"></div>
-  </div>
 </div>
 
 <script>
-let cart = JSON.parse(localStorage.getItem("cart")) || [];
-let user = localStorage.getItem("user");
-
-updateCart();
-
-function addToCart(item){
-  cart.push(item);
-  localStorage.setItem("cart", JSON.stringify(cart));
-  updateCart();
-  alert("Added to cart");
-}
-
-function updateCart(){
-  document.getElementById("cartCount").innerText = cart.length;
-}
-
-function openCart(){
-  document.getElementById("cartModal").style.display="flex";
-  document.getElementById("cartItems").innerHTML = cart.join("<br>");
-}
-
-function openAuth(){
-  document.getElementById("authModal").style.display="flex";
-}
-
-function login(){
-  let email = document.getElementById("email").value;
-  let phone = document.getElementById("phone").value;
-
-  if(!email || !phone){
-    alert("Fill all fields");
-    return;
-  }
-
-  localStorage.setItem("user", email);
-  document.getElementById("userBtn").innerText = email;
-  document.getElementById("authModal").style.display="none";
-}
-
-if(user){
-  document.getElementById("userBtn").innerText = user;
-}
+setTimeout(() => {
+  document.getElementById("splash").style.display = "none";
+  document.getElementById("main").style.display = "block";
+}, 2000);
 </script>
 
 </body>
