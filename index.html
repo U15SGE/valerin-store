@@ -1000,7 +1000,13 @@ footer{background:#020109;padding:60px 50px 36px;border-top:1px solid rgba(200,2
   <div style="padding:28px 36px;">
     <div style="font-family:'Syne',sans-serif;font-size:.56rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--silver);margin-bottom:18px;padding-bottom:8px;border-bottom:1px solid rgba(200,205,214,.07);">My Orders</div>
     <div id="dashOrders"></div>
-    <button onclick="doLogout()" style="width:100%;font-family:'Syne',sans-serif;font-size:.6rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;border:1px solid rgba(232,41,74,.3);padding:13px;color:rgba(232,41,74,.7);background:rgba(232,41,74,.06);clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);transition:all .3s;margin-top:24px;">&#10005; Logout</button>
+    
+    <!-- Admin Link (only for admin) -->
+    <div id="dashAdminLink" style="display:none;margin-top:16px;">
+      <button onclick="closeDash();openAdmin();" style="width:100%;font-family:'Syne',sans-serif;font-size:.6rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;border:1px solid rgba(123,47,255,.3);padding:13px;color:rgba(123,47,255,.8);background:rgba(123,47,255,.06);clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);transition:all .3s;">&#9632; Admin Panel</button>
+    </div>
+    
+    <button onclick="doLogout()" style="width:100%;font-family:'Syne',sans-serif;font-size:.6rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;border:1px solid rgba(232,41,74,.3);padding:13px;color:rgba(232,41,74,.7);background:rgba(232,41,74,.06);clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);transition:all .3s;margin-top:12px;">&#10005; Logout</button>
   </div>
 </div>
 <style>
@@ -1341,21 +1347,42 @@ var currentUser = null;
 async function initAuth(){
   try{
     var stored = localStorage.getItem('vlr_user');
-    if(stored) currentUser = JSON.parse(stored);
+    if(stored){
+      var parsedUser = JSON.parse(stored);
+      // Always fetch fresh from Supabase to get latest is_verified status
+      var {data:freshUser} = await sb.from('users').select('*').eq('email', parsedUser.email).single();
+      if(freshUser){
+        currentUser = freshUser;
+        localStorage.setItem('vlr_user', JSON.stringify(freshUser));
+      } else {
+        currentUser = parsedUser;
+      }
+    }
     updateNavForUser();
-  }catch(e){}
+  }catch(e){
+    try{
+      var stored2 = localStorage.getItem('vlr_user');
+      if(stored2) currentUser = JSON.parse(stored2);
+      updateNavForUser();
+    }catch(e2){}
+  }
 }
 
 function updateNavForUser(){
   var btn = document.getElementById('loginBtn');
   var adminBtn = document.getElementById('adminBtn');
   if(currentUser){
-    btn.title = currentUser.name || 'My Account';
-    btn.innerHTML = '<span style="font-family:Syne,sans-serif;font-size:.5rem;font-weight:700;color:var(--sl);">' + (currentUser.name||'').split(' ')[0].substring(0,2).toUpperCase() + '</span>';
+    var initials = (currentUser.name||'VA').split(' ').map(function(w){return w[0];}).join('').substring(0,2).toUpperCase();
+    btn.title = (currentUser.name||'My Account') + ' — Click for Dashboard';
+    btn.innerHTML = '<span style="font-family:Syne,sans-serif;font-size:.55rem;font-weight:700;color:var(--sl);">' + initials + '</span>';
     btn.onclick = openDash;
-    if(currentUser.email === ADMIN_EMAIL && adminBtn){
-      adminBtn.style.display = 'flex';
-      adminBtn.onclick = openAdmin;
+    if(adminBtn){
+      if(currentUser.email === ADMIN_EMAIL){
+        adminBtn.style.display = 'flex';
+        adminBtn.onclick = openAdmin;
+      } else {
+        adminBtn.style.display = 'none';
+      }
     }
   } else {
     btn.title = 'Account';
@@ -1552,6 +1579,12 @@ async function openDash(){
   document.getElementById('dashEmail').textContent = currentUser.email||'';
   document.getElementById('dashAvLetter').textContent = (currentUser.name||'V')[0].toUpperCase();
   document.getElementById('dashOrders').innerHTML = orderHTML;
+  
+  // Show admin link inside dashboard if admin user
+  var adminLinkEl = document.getElementById('dashAdminLink');
+  if(adminLinkEl){
+    adminLinkEl.style.display = (currentUser.email === ADMIN_EMAIL) ? 'block' : 'none';
+  }
   
   document.getElementById('dashModal').classList.add('open');
   document.getElementById('bd').classList.add('open');
