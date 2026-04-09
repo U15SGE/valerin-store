@@ -989,29 +989,40 @@ footer{background:#020109;padding:60px 50px 36px;border-top:1px solid rgba(200,2
 
 <!-- ===== CUSTOMER DASHBOARD ===== -->
 <div id="dashModal" style="position:fixed;top:50%;left:50%;transform:translate(-50%,-48%) scale(.95);z-index:9002;width:min(640px,96vw);max-height:90vh;overflow-y:auto;background:linear-gradient(160deg,#0d0b18,#07050f);border:1px solid rgba(200,205,214,.1);opacity:0;visibility:hidden;transition:all .35s;">
-  <button class="auth-close" onclick="closeDash()">&#10005;</button>
+  
+  <!-- Close Button -->
+  <button onclick="closeDash()" style="position:absolute;top:14px;right:14px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);border-radius:50%;color:rgba(248,244,255,.6);width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:.9rem;z-index:10;">&#10005;</button>
+  
+  <!-- Header -->
   <div style="background:linear-gradient(135deg,rgba(200,205,214,.06),rgba(200,205,214,.02));padding:32px 36px;border-bottom:1px solid rgba(200,205,214,.07);display:flex;align-items:center;gap:20px;">
-    <div style="width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,var(--pink),var(--violet));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:700;color:#fff;flex-shrink:0;" id="dashAvLetter">V</div>
+    <div id="dashAvLetter" style="width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,var(--pink),var(--violet));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:700;color:#fff;flex-shrink:0;">V</div>
     <div>
-      <div style="font-family:'Cormorant',serif;font-size:1.6rem;font-weight:300;" id="dashName"></div>
-      <div style="font-size:.58rem;color:rgba(248,244,255,.35);margin-top:3px;" id="dashEmail"></div>
+      <div id="dashName" style="font-family:'Cormorant',serif;font-size:1.6rem;font-weight:300;"></div>
+      <div id="dashEmail" style="font-size:.58rem;color:rgba(248,244,255,.35);margin-top:3px;"></div>
     </div>
   </div>
+  
+  <!-- Body -->
   <div style="padding:28px 36px;">
-    <div style="font-family:'Syne',sans-serif;font-size:.56rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--silver);margin-bottom:18px;padding-bottom:8px;border-bottom:1px solid rgba(200,205,214,.07);">My Orders</div>
+    
+    <!-- Orders Section -->
+    <div style="font-family:'Syne',sans-serif;font-size:.56rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--silver);margin-bottom:18px;padding-bottom:8px;border-bottom:1px solid rgba(200,205,214,.07);">&#128666; My Orders</div>
     <div id="dashOrders"></div>
     
-    <!-- Admin Link (only for admin) -->
-    <div id="dashAdminLink" style="display:none;margin-top:16px;">
-      <button onclick="closeDash();openAdmin();" style="width:100%;font-family:'Syne',sans-serif;font-size:.6rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;border:1px solid rgba(123,47,255,.3);padding:13px;color:rgba(123,47,255,.8);background:rgba(123,47,255,.06);clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);transition:all .3s;">&#9632; Admin Panel</button>
+    <!-- Admin Panel Button (only for admin) -->
+    <div id="dashAdminLink" style="display:none;margin-top:20px;">
+      <div style="font-family:'Syne',sans-serif;font-size:.56rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--silver);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid rgba(200,205,214,.07);">&#9632; Admin</div>
+      <button onclick="closeDash();setTimeout(openAdmin,300);" style="width:100%;font-family:'Syne',sans-serif;font-size:.62rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;border:1px solid rgba(123,47,255,.4);padding:14px;color:rgba(180,140,255,.9);background:rgba(123,47,255,.08);clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);transition:all .3s;">&#9632; Open Admin Panel</button>
     </div>
     
-    <button onclick="doLogout()" style="width:100%;font-family:'Syne',sans-serif;font-size:.6rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;border:1px solid rgba(232,41,74,.3);padding:13px;color:rgba(232,41,74,.7);background:rgba(232,41,74,.06);clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);transition:all .3s;margin-top:12px;">&#10005; Logout</button>
+    <!-- Logout Button -->
+    <button id="dashLogoutBtn" onclick="doLogout()" style="width:100%;font-family:'Syne',sans-serif;font-size:.62rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;border:1px solid rgba(232,41,74,.4);padding:14px;color:rgba(232,41,74,.85);background:rgba(232,41,74,.07);clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);transition:all .3s;margin-top:16px;">&#10005; Logout</button>
+    
   </div>
 </div>
 <style>
-#dashModal.open{opacity:1;visibility:visible;transform:translate(-50%,-50%) scale(1);}
-.dash-order-card{background:rgba(255,255,255,.03);border:1px solid rgba(200,205,214,.07);padding:18px 20px;margin-bottom:12px;transition:border-color .3s;}
+#dashModal.open{opacity:1!important;visibility:visible!important;transform:translate(-50%,-50%) scale(1)!important;}
+.dash-order-card{background:rgba(255,255,255,.03);border:1px solid rgba(200,205,214,.07);padding:18px 20px;margin-bottom:12px;}
 .dash-order-card:hover{border-color:rgba(200,205,214,.18);}
 .dash-order-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
 .dash-order-num{font-family:'Syne',sans-serif;font-size:.58rem;font-weight:700;letter-spacing:.14em;color:var(--sl);}
@@ -1024,16 +1035,9 @@ footer{background:#020109;padding:60px 50px 36px;border-top:1px solid rgba(200,2
 .status-pending{background:rgba(255,215,0,.1);color:rgba(255,215,0,.9);border:1px solid rgba(255,215,0,.25);}
 .status-delivered{background:rgba(0,245,255,.1);color:rgba(0,245,255,.9);border:1px solid rgba(0,245,255,.25);}
 .dash-empty{text-align:center;padding:40px 20px;color:rgba(248,244,255,.25);font-family:'Cormorant',serif;font-style:italic;font-size:1.05rem;}
-.auth-modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-48%) scale(.95);z-index:9001;width:min(460px,94vw);background:linear-gradient(160deg,#0d0b18,#07050f);border:1px solid rgba(200,205,214,.1);padding:44px 40px;opacity:0;visibility:hidden;transition:all .35s;max-height:90vh;overflow-y:auto;}
-.auth-modal.open{opacity:1;visibility:visible;transform:translate(-50%,-50%) scale(1);}
-.auth-close{position:absolute;top:14px;right:14px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);border-radius:50%;color:rgba(248,244,255,.6);width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:.9rem;transition:all .3s;z-index:10;}
-.auth-close:hover{background:rgba(255,60,172,.15);border-color:var(--pink);color:#fff;}
-.auth-tabs{display:flex;border-bottom:1px solid rgba(200,205,214,.1);margin-bottom:24px;}
-.auth-tab{flex:1;padding:9px;background:none;border:none;font-family:'Syne',sans-serif;font-size:.58rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:rgba(248,244,255,.28);border-bottom:2px solid transparent;transition:all .3s;margin-bottom:-1px;}
-.auth-tab.active{color:var(--sl);border-bottom-color:var(--sl);}
 </style>
 
-<!-- ===== ADMIN PANEL ===== -->
+<!-- ===== ADMIN PANEL<!-- ===== ADMIN PANEL ===== -->
 <div id="adminModal" style="position:fixed;inset:0;z-index:9010;background:#020109;overflow-y:auto;opacity:0;visibility:hidden;transition:all .3s;">
   <div style="background:rgba(200,205,214,.04);border-bottom:1px solid rgba(200,205,214,.07);padding:0 36px;display:flex;align-items:center;justify-content:space-between;height:64px;position:sticky;top:0;z-index:10;backdrop-filter:blur(20px);">
     <div style="font-family:'Cormorant',serif;font-size:1.3rem;font-weight:300;letter-spacing:.2em;">VALERIN <span style="background:linear-gradient(90deg,var(--pink),var(--violet));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">ADMIN</span></div>
@@ -1560,36 +1564,47 @@ function doLogout(){
 async function openDash(){
   if(!currentUser){openAuth();return;}
   
-  // Load orders
-  var {data:orders} = await sb.from('orders').select('*').eq('customer_email',currentUser.email).order('created_at',{ascending:false});
-  
-  var orderHTML = '';
-  if(orders && orders.length>0){
-    orderHTML = orders.map(function(o){
-      var statusClass = o.order_status==='confirmed'?'status-confirmed':o.order_status==='delivered'?'status-delivered':'status-pending';
-      var itemNames = Array.isArray(o.items)?o.items.map(function(i){return i.name+' x'+i.qty;}).join(', '):'';
-      var date = new Date(o.created_at).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
-      return '<div class="dash-order-card"><div class="dash-order-top"><span class="dash-order-num">'+o.order_number+'</span><span class="dash-order-date">'+date+'</span></div><div class="dash-order-items">'+itemNames+'</div><div class="dash-order-footer"><span class="dash-order-total">&#8377;'+o.total.toLocaleString('en-IN')+'</span><span class="dash-status '+statusClass+'">'+o.order_status.toUpperCase()+'</span></div></div>';
-    }).join('');
-  }else{
-    orderHTML = '<div class="dash-empty">No orders yet. Start shopping! ✦</div>';
-  }
-  
-  document.getElementById('dashName').textContent = currentUser.name||'';
-  document.getElementById('dashEmail').textContent = currentUser.email||'';
-  document.getElementById('dashAvLetter').textContent = (currentUser.name||'V')[0].toUpperCase();
+  // Load orders from Supabase
+  var orderHTML = '<div class="dash-empty">Loading orders...</div>';
   document.getElementById('dashOrders').innerHTML = orderHTML;
   
-  // Show admin link inside dashboard if admin user
-  var adminLinkEl = document.getElementById('dashAdminLink');
-  if(adminLinkEl){
-    adminLinkEl.style.display = (currentUser.email === ADMIN_EMAIL) ? 'block' : 'none';
-  }
+  // Set user info
+  var initials = (currentUser.name||'VA').split(' ').map(function(w){return w[0]||'';}).join('').substring(0,2).toUpperCase();
+  document.getElementById('dashAvLetter').textContent = initials;
+  document.getElementById('dashName').textContent = currentUser.name||'';
+  document.getElementById('dashEmail').textContent = currentUser.email||'';
   
+  // Show admin link if admin
+  var adminLink = document.getElementById('dashAdminLink');
+  if(adminLink) adminLink.style.display = (currentUser.email === ADMIN_EMAIL) ? 'block' : 'none';
+  
+  // Open modal first so user sees loading
   document.getElementById('dashModal').classList.add('open');
   document.getElementById('bd').classList.add('open');
+  
+  // Then load orders
+  try{
+    var result = await sb.from('orders').select('*').eq('customer_email', currentUser.email).order('created_at',{ascending:false});
+    var orders = result.data || [];
+    
+    if(orders.length > 0){
+      orderHTML = orders.map(function(o){
+        var statusClass = o.order_status==='confirmed'?'status-confirmed':o.order_status==='delivered'?'status-delivered':'status-pending';
+        var items = Array.isArray(o.items) ? o.items.map(function(i){return i.name+' x'+i.qty;}).join(', ') : '';
+        var date = new Date(o.created_at).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
+        return '<div class="dash-order-card"><div class="dash-order-top"><span class="dash-order-num">'+o.order_number+'</span><span class="dash-order-date">'+date+'</span></div><div class="dash-order-items">'+items+'</div><div class="dash-order-footer"><span class="dash-order-total">&#8377;'+o.total.toLocaleString('en-IN')+'</span><span class="dash-status '+statusClass+'">'+o.order_status.toUpperCase()+'</span></div></div>';
+      }).join('');
+    } else {
+      orderHTML = '<div class="dash-empty">No orders yet. Start shopping! ✦</div>';
+    }
+  }catch(e){
+    orderHTML = '<div class="dash-empty">Could not load orders.</div>';
+  }
+  
+  document.getElementById('dashOrders').innerHTML = orderHTML;
 }
-function closeDash(){
+
+function closeDash()function closeDash(){
   document.getElementById('dashModal').classList.remove('open');
   document.getElementById('bd').classList.remove('open');
 }
