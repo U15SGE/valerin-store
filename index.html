@@ -1037,7 +1037,7 @@ footer{background:#020109;padding:60px 50px 36px;border-top:1px solid rgba(200,2
 .dash-empty{text-align:center;padding:40px 20px;color:rgba(248,244,255,.25);font-family:'Cormorant',serif;font-style:italic;font-size:1.05rem;}
 </style>
 
-<!-- ===== ADMIN PANEL<!-- ===== ADMIN PANEL ===== -->
+<!-- ===== ADMIN PANEL ===== -->
 <div id="adminModal" style="position:fixed;inset:0;z-index:9010;background:#020109;overflow-y:auto;opacity:0;visibility:hidden;transition:all .3s;">
   <div style="background:rgba(200,205,214,.04);border-bottom:1px solid rgba(200,205,214,.07);padding:0 36px;display:flex;align-items:center;justify-content:space-between;height:64px;position:sticky;top:0;z-index:10;backdrop-filter:blur(20px);">
     <div style="font-family:'Cormorant',serif;font-size:1.3rem;font-weight:300;letter-spacing:.2em;">VALERIN <span style="background:linear-gradient(90deg,var(--pink),var(--violet));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">ADMIN</span></div>
@@ -1604,7 +1604,7 @@ async function openDash(){
   document.getElementById('dashOrders').innerHTML = orderHTML;
 }
 
-function closeDash()function closeDash(){
+function closeDash(){
   document.getElementById('dashModal').classList.remove('open');
   document.getElementById('bd').classList.remove('open');
 }
