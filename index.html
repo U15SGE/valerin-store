@@ -871,7 +871,7 @@ footer{background:#020109;padding:60px 50px 36px;border-top:1px solid rgba(200,2
       <div class="pay-method" data-method="upi" onclick="selPay(this,'upi')"><div class="pay-method-icon">&#128241;</div><div class="pay-method-label">UPI</div></div>
       <div class="pay-method" data-method="netbanking" onclick="selPay(this,'netbanking')"><div class="pay-method-icon">&#127974;</div><div class="pay-method-label">Net Banking</div></div>
       <div class="pay-method" data-method="cod" onclick="selPay(this,'cod')"><div class="pay-method-icon">&#128181;</div><div class="pay-method-label">COD</div></div>
-      <div class="pay-method" data-method="emi" onclick="selPay(this,'emi')"><div class="pay-method-icon">&#128197;</div><div class="pay-method-label">EMI</div></div>
+
     </div>
     <div id="payCard">
       <div class="co-grid" style="margin-bottom:12px;"><div class="co-field full"><label>Card Number</label><input type="text" placeholder="0000 0000 0000 0000" maxlength="19" oninput="fmtCard(this)"/></div></div>
@@ -880,7 +880,7 @@ footer{background:#020109;padding:60px 50px 36px;border-top:1px solid rgba(200,2
     <div id="payUPI" style="display:none;"><div class="co-field"><label>UPI ID</label><input type="text" placeholder="yourname@upi"/></div><div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;"><span style="background:rgba(255,255,255,.04);border:1px solid rgba(200,205,214,.1);padding:8px 14px;font-size:.58rem;color:rgba(248,244,255,.4);">&#128241; Google Pay</span><span style="background:rgba(255,255,255,.04);border:1px solid rgba(200,205,214,.1);padding:8px 14px;font-size:.58rem;color:rgba(248,244,255,.4);">&#128156; PhonePe</span><span style="background:rgba(255,255,255,.04);border:1px solid rgba(200,205,214,.1);padding:8px 14px;font-size:.58rem;color:rgba(248,244,255,.4);">&#128309; Paytm</span></div></div>
     <div id="payNB" style="display:none;"><div class="co-field"><label>Select Bank</label><select><option value="">Choose bank</option><option>SBI</option><option>HDFC Bank</option><option>ICICI Bank</option><option>Axis Bank</option><option>Kotak Bank</option><option>PNB</option><option>Other</option></select></div></div>
     <div id="payCOD" style="display:none;"><div style="padding:18px;background:rgba(255,255,255,.02);border:1px solid rgba(200,205,214,.08);text-align:center;"><div style="font-size:1.8rem;margin-bottom:8px;">&#128181;</div><div style="font-family:'Cormorant',serif;font-size:1rem;font-style:italic;margin-bottom:6px;">Cash on Delivery</div><p style="font-size:.62rem;color:rgba(248,244,255,.32);line-height:1.75;">Pay when your order arrives. Available across India.</p></div></div>
-    <div id="payEMI" style="display:none;"><div class="co-field" style="margin-bottom:12px;"><label>Card Number</label><input type="text" placeholder="0000 0000 0000 0000"/></div><div class="co-field"><label>EMI Plan</label><select><option value="">Select duration</option><option>3 Months — No Cost EMI</option><option>6 Months — No Cost EMI</option><option>9 Months</option><option>12 Months</option></select></div></div>
+
   </div>
   <div class="co-sec">
     <div class="co-sec-title">Order Summary</div>
@@ -1221,8 +1221,8 @@ function closeCheckout(){document.getElementById('coModal').classList.remove('op
 function selPay(el,method){
   document.querySelectorAll('.pay-method').forEach(function(m){m.classList.remove('sel');});
   el.classList.add('sel');
-  ['payCard','payUPI','payNB','payCOD','payEMI'].forEach(function(id){var e2=document.getElementById(id);if(e2)e2.style.display='none';});
-  var map={card:'payCard',upi:'payUPI',netbanking:'payNB',cod:'payCOD',emi:'payEMI'};
+  ['payCard','payUPI','payNB','payCOD'].forEach(function(id){var e2=document.getElementById(id);if(e2)e2.style.display='none';});
+  var map={card:'payCard',upi:'payUPI',netbanking:'payNB',cod:'payCOD'};
   if(map[method]){var t=document.getElementById(map[method]);if(t)t.style.display='block';}
 }
 function fmtCard(inp){var v=inp.value.replace(/[^0-9]/g,'').substring(0,16);inp.value=v.replace(/(.{4})/g,'$1 ').trim();}
@@ -1285,8 +1285,8 @@ async function placeOrder(){
     var r2=await fetch('/api/create-order',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({amount:total})});
     var data=await r2.json();
     if(!data.success){showToast('Payment setup failed','err');btn.textContent=orig;btn.style.opacity='1';return;}
-    var s=document.createElement('script');s.src='https://checkout.razorpay.com/v1/checkout.js';
-    s.onload=function(){
+    // Load Razorpay if not already loaded
+    var openRazorpay = function(){
       var opts={
         key:data.key,amount:data.amount,currency:data.currency,order_id:data.order_id,
         name:'VALERIN',description:'Fine Jewellery',
@@ -1298,7 +1298,6 @@ async function placeOrder(){
             var vr=await fetch('/api/verify-payment',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({razorpay_order_id:resp.razorpay_order_id,razorpay_payment_id:resp.razorpay_payment_id,razorpay_signature:resp.razorpay_signature,customer,items:cart,total})});
             var vd=await vr.json();
             if(vd.success){
-              // Save to Supabase
               var uid2 = currentUser ? currentUser.id : null;
               await sb.from('orders').insert([{
                 order_number: vd.order_id||orderNum,
@@ -1317,17 +1316,24 @@ async function placeOrder(){
                 order_status: 'confirmed',
                 razorpay_order_id: resp.razorpay_order_id,
                 razorpay_payment_id: resp.razorpay_payment_id
-              }]).catch(()=>{});
+              }]).catch(function(){});
               succeedOrder(vd.order_id||orderNum);
-            }else{showToast('Verification failed','err');}
-          }catch(e){showToast('Error. Please contact us.','err');}
+            }else{showToast('Payment verification failed','err');}
+          }catch(e){showToast('Error verifying payment. Contact us.','err');}
           btn.textContent=orig;btn.style.opacity='1';
         },
-        modal:{ondismiss:function(){btn.textContent=orig;btn.style.opacity='1';showToast('Payment cancelled','err');}}
+        modal:{ondismiss:function(){btn.textContent=orig;btn.style.opacity='1';showToast('Payment cancelled');}}
       };
-      new Razorpay(opts).open();
+      try{ new Razorpay(opts).open(); }
+      catch(e){ showToast('Payment gateway error: '+e.message,'err');btn.textContent=orig;btn.style.opacity='1'; }
     };
-    document.head.appendChild(s);
+    if(window.Razorpay){ openRazorpay(); }
+    else{
+      var rzpScript=document.createElement('script');rzpScript.src='https://checkout.razorpay.com/v1/checkout.js';
+      rzpScript.onload=openRazorpay;
+      rzpScript.onerror=function(){showToast('Payment gateway failed to load','err');btn.textContent=orig;btn.style.opacity='1';};
+      document.head.appendChild(rzpScript);
+    }
   }catch(e){showToast('Something went wrong','err');btn.textContent=orig;btn.style.opacity='1';}
 }
 
