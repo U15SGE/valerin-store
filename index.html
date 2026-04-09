@@ -1090,7 +1090,7 @@ window.onerror=function(){return true;};
 // ===== SUPABASE INIT =====
 const SUPA_URL = 'https://kvpevutvvnpddqdvzbwu.supabase.co';
 const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt2cGV2dXR2dm5wZGRxZHZ6Ynd1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU0OTMxNTQsImV4cCI6MjA5MTA2OTE1NH0.AMKfRue8kZ76L_VIuGN7akwmkKRYJC58Thxsrcgi8lY';
-const ADMIN_EMAIL = 'shrigovindenterprises8@gmail.com';
+const ADMIN_EMAIL = 'shrigovindenterprises8@gmail.com'; // admin
 const sb = supabase.createClient(SUPA_URL, SUPA_KEY);
 
 // ===== CURSOR =====
@@ -1381,7 +1381,7 @@ function updateNavForUser(){
     btn.innerHTML = '<span style="font-family:Syne,sans-serif;font-size:.55rem;font-weight:700;color:var(--sl);">' + initials + '</span>';
     btn.onclick = openDash;
     if(adminBtn){
-      if(currentUser.email === ADMIN_EMAIL){
+      if((currentUser.email||'').trim().toLowerCase() === ADMIN_EMAIL.trim().toLowerCase()){
         adminBtn.style.display = 'flex';
         adminBtn.onclick = openAdmin;
       } else {
@@ -1576,7 +1576,7 @@ async function openDash(){
   
   // Show admin link if admin
   var adminLink = document.getElementById('dashAdminLink');
-  if(adminLink) adminLink.style.display = (currentUser.email === ADMIN_EMAIL) ? 'block' : 'none';
+  if(adminLink) adminLink.style.display = ((currentUser.email||'').trim().toLowerCase() === ADMIN_EMAIL.trim().toLowerCase()) ? 'block' : 'none';
   
   // Open modal first so user sees loading
   document.getElementById('dashModal').classList.add('open');
@@ -1611,7 +1611,17 @@ function closeDash(){
 
 // ===== ADMIN PANEL =====
 async function openAdmin(){
-  if(!currentUser || currentUser.email !== ADMIN_EMAIL){showToast('Access denied','err');return;}
+  if(!currentUser){showToast('Please login first','err');return;}
+  
+  // Trim and compare emails (case insensitive)
+  var userEmail = (currentUser.email||'').trim().toLowerCase();
+  var adminEmail = ADMIN_EMAIL.trim().toLowerCase();
+  
+  if(userEmail !== adminEmail){
+    showToast('Access denied: '+userEmail,'err');
+    console.log('Admin check failed. User email:', userEmail, 'Admin email:', adminEmail);
+    return;
+  }
   
   document.getElementById('adminModal').classList.add('open');
   loadAdminData();
