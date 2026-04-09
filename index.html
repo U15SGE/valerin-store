@@ -516,6 +516,9 @@ footer{background:#020109;padding:60px 50px 36px;border-top:1px solid rgba(200,2
     <button class="nib" id="loginBtn">
       <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
     </button>
+    <button class="nib" id="adminBtn" title="Admin Panel" style="display:none;">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+    </button>
   </div>
 </nav>
 
@@ -1427,8 +1430,23 @@ async function doSignup(e){
     window._pendingUser = newUser;
     window._pendingOTP = otp;
     showOTPPanel('verify', email, otp);
-    showToast('OTP sent! Check console for now: '+otp);
-    console.log('OTP for '+email+':', otp);
+    // Try to send email via Supabase Auth
+    try {
+      const { error: authErr } = await sb.auth.signUp({
+        email: email,
+        password: pw,
+        options: { data: { name: name, phone: phone } }
+      });
+      if(!authErr) {
+        showToast('OTP sent to your email! Check inbox.');
+      } else {
+        showToast('OTP: '+otp+' (check console)', 'err');
+        console.log('OTP for '+email+':', otp);
+      }
+    } catch(authE) {
+      showToast('OTP sent! Check console: '+otp);
+      console.log('OTP for '+email+':', otp);
+    }
     
   }catch(err){
     console.error(err);
