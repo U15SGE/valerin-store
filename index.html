@@ -516,7 +516,7 @@ footer{background:#020109;padding:60px 50px 36px;border-top:1px solid rgba(200,2
     <button class="nib" id="loginBtn">
       <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
     </button>
-    <button class="nib" id="adminBtn" title="Admin Panel" style="display:none;">
+    <button class="nib" id="adminBtn" title="Admin Panel" style="display:none;" onclick="openAdmin()">
       <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
     </button>
   </div>
@@ -1012,7 +1012,7 @@ footer{background:#020109;padding:60px 50px 36px;border-top:1px solid rgba(200,2
     <!-- Admin Panel Button (only for admin) -->
     <div id="dashAdminLink" style="display:none;margin-top:20px;">
       <div style="font-family:'Syne',sans-serif;font-size:.56rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--silver);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid rgba(200,205,214,.07);">&#9632; Admin</div>
-      <button onclick="closeDash();setTimeout(openAdmin,300);" style="width:100%;font-family:'Syne',sans-serif;font-size:.62rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;border:1px solid rgba(123,47,255,.4);padding:14px;color:rgba(180,140,255,.9);background:rgba(123,47,255,.08);clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);transition:all .3s;">&#9632; Open Admin Panel</button>
+      <button onclick="closeDash();setTimeout(function(){openAdmin();},300);" style="width:100%;font-family:'Syne',sans-serif;font-size:.62rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;border:1px solid rgba(123,47,255,.4);padding:14px;color:rgba(180,140,255,.9);background:rgba(123,47,255,.08);clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);transition:all .3s;">&#9632; Open Admin Panel</button>
     </div>
     
     <!-- Logout Button -->
@@ -1075,7 +1075,7 @@ footer{background:#020109;padding:60px 50px 36px;border-top:1px solid rgba(200,2
   </div>
 </div>
 <style>
-#adminModal.open{opacity:1;visibility:visible;}
+#adminModal.open{opacity:1!important;visibility:visible!important;display:block!important;}
 .admin-tab.active{color:var(--sl)!important;border-bottom-color:var(--sl)!important;}
 #adminTableBody th{font-family:'Syne',sans-serif;font-size:.5rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:rgba(248,244,255,.3);padding:10px 14px;text-align:left;border-bottom:1px solid rgba(200,205,214,.07);}
 #adminTableBody td{font-size:.65rem;padding:14px;border-bottom:1px solid rgba(200,205,214,.04);color:rgba(248,244,255,.65);}
@@ -1376,22 +1376,21 @@ function updateNavForUser(){
   var btn = document.getElementById('loginBtn');
   var adminBtn = document.getElementById('adminBtn');
   if(currentUser){
-    var initials = (currentUser.name||'VA').split(' ').map(function(w){return w[0];}).join('').substring(0,2).toUpperCase();
-    btn.title = (currentUser.name||'My Account') + ' — Click for Dashboard';
+    var initials = (currentUser.name||'VA').split(' ').map(function(w){return w[0]||'';}).join('').substring(0,2).toUpperCase()||'U';
+    btn.title = (currentUser.name||'My Account') + ' — Dashboard';
     btn.innerHTML = '<span style="font-family:Syne,sans-serif;font-size:.55rem;font-weight:700;color:var(--sl);">' + initials + '</span>';
-    btn.onclick = openDash;
+    btn.onclick = function(){ openDash(); return false; };
     if(adminBtn){
-      if((currentUser.email||'').trim().toLowerCase() === ADMIN_EMAIL.trim().toLowerCase()){
-        adminBtn.style.display = 'flex';
-        adminBtn.onclick = openAdmin;
-      } else {
-        adminBtn.style.display = 'none';
-      }
+      var uEmail = (currentUser.email||'').toLowerCase().trim();
+      var aEmail = (ADMIN_EMAIL||'').toLowerCase().trim();
+      var isAdmin = (uEmail === aEmail);
+      adminBtn.style.display = isAdmin ? 'flex' : 'none';
+      // onclick already set in HTML
     }
   } else {
     btn.title = 'Account';
     btn.innerHTML = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
-    btn.onclick = openAuth;
+    btn.onclick = function(){ openAuth(); return false; };
     if(adminBtn) adminBtn.style.display = 'none';
   }
 }
@@ -1613,17 +1612,19 @@ function closeDash(){
 async function openAdmin(){
   if(!currentUser){showToast('Please login first','err');return;}
   
-  // Trim and compare emails (case insensitive)
-  var userEmail = (currentUser.email||'').trim().toLowerCase();
-  var adminEmail = ADMIN_EMAIL.trim().toLowerCase();
+  // Debug
+  console.log('openAdmin called');
+  console.log('currentUser:', currentUser);
+  console.log('email:', JSON.stringify(currentUser.email));
+  console.log('ADMIN_EMAIL:', JSON.stringify(ADMIN_EMAIL));
   
-  if(userEmail !== adminEmail){
-    showToast('Access denied: '+userEmail,'err');
-    console.log('Admin check failed. User email:', userEmail, 'Admin email:', adminEmail);
-    return;
-  }
+  var m = document.getElementById('adminModal');
+  if(!m){console.error('adminModal not found!');showToast('Admin modal missing','err');return;}
   
-  document.getElementById('adminModal').classList.add('open');
+  m.style.opacity='1';
+  m.style.visibility='visible';
+  m.classList.add('open');
+  console.log('Admin modal opened!');
   loadAdminData();
 }
 function closeAdmin(){document.getElementById('adminModal').classList.remove('open');}
