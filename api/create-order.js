@@ -20,34 +20,18 @@ export default async function handler(req, res) {
   }
 
   try {
-    const body = JSON.stringify({
-      amount: Math.round(amount * 100),
-      currency: 'INR',
-      receipt: `vlr_${Date.now()}`,
-    });
-
     const auth = Buffer.from(`${KEY_ID}:${KEY_SECRET}`).toString('base64');
     const response = await fetch('https://api.razorpay.com/v1/orders', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Basic ${auth}`,
-      },
-      body,
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Basic ${auth}` },
+      body: JSON.stringify({ amount: Math.round(amount * 100), currency: 'INR', receipt: `vlr_${Date.now()}` }),
     });
-
     const data = await response.json();
     if (data.id) {
-      return res.status(200).json({
-        success: true,
-        order_id: data.id,
-        amount: data.amount,
-        currency: data.currency,
-        key: KEY_ID,
-      });
+      return res.status(200).json({ success: true, order_id: data.id, amount: data.amount, currency: data.currency, key: KEY_ID });
     }
-    return res.status(400).json({ error: data.error?.description || 'Razorpay error' });
+    return res.status(400).json({ success: false, error: data.error?.description || 'Razorpay error' });
   } catch (err) {
-    return res.status(500).json({ error: 'Server error' });
+    return res.status(500).json({ success: false, error: 'Server error' });
   }
 }
