@@ -883,6 +883,13 @@ footer{background:#020109;padding:60px 50px 36px;border-top:1px solid rgba(200,2
 
   </div>
   <div class="co-sec">
+    <div class="co-sec-title">Coupon Code</div>
+    <div style="display:flex;gap:10px;">
+      <input type="text" id="couponInput" placeholder="Enter coupon code" style="flex:1;font-family:'DM Sans',sans-serif;font-size:.72rem;color:#fff;background:rgba(255,255,255,.04);border:1px solid rgba(200,205,214,.12);padding:10px 12px;outline:none;" oninput="this.value=this.value.toUpperCase()">
+      <button onclick="applyCoupon(document.getElementById('couponInput').value)" style="font-family:'Syne',sans-serif;font-size:.58rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;border:none;padding:10px 20px;color:#04030a;background:linear-gradient(135deg,#c8cdd6,#fff);cursor:pointer;">Apply</button>
+    </div>
+  </div>
+  <div class="co-sec">
     <div class="co-sec-title">Order Summary</div>
     <div id="coItems"></div>
     <div class="co-total-row"><span class="co-total-label">Total (incl. free shipping)</span><span class="co-total-val" id="coTotal">&#8377;0</span></div>
@@ -1039,52 +1046,271 @@ footer{background:#020109;padding:60px 50px 36px;border-top:1px solid rgba(200,2
 
 <!-- ===== ADMIN PANEL ===== -->
 <div id="adminModal" style="position:fixed;inset:0;z-index:9010;background:#020109;overflow-y:auto;opacity:0;visibility:hidden;transition:all .3s;">
-  <div style="background:rgba(200,205,214,.04);border-bottom:1px solid rgba(200,205,214,.07);padding:0 36px;display:flex;align-items:center;justify-content:space-between;height:64px;position:sticky;top:0;z-index:10;backdrop-filter:blur(20px);">
+  <!-- Admin Header -->
+  <div style="background:rgba(200,205,214,.04);border-bottom:1px solid rgba(200,205,214,.07);padding:0 28px;display:flex;align-items:center;justify-content:space-between;height:64px;position:sticky;top:0;z-index:10;backdrop-filter:blur(20px);">
     <div style="font-family:'Cormorant',serif;font-size:1.3rem;font-weight:300;letter-spacing:.2em;">VALERIN <span style="background:linear-gradient(90deg,var(--pink),var(--violet));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">ADMIN</span></div>
-    <button onclick="document.getElementById('adminModal').classList.remove('open');document.getElementById('adminModal').style.opacity='0';document.getElementById('adminModal').style.visibility='hidden';" style="background:none;border:1px solid rgba(200,205,214,.15);color:rgba(248,244,255,.5);padding:7px 18px;font-family:'Syne',sans-serif;font-size:.54rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;transition:all .3s;">&#10005; Close</button>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <span id="adminLiveTime" style="font-size:.52rem;color:rgba(248,244,255,.25);letter-spacing:.1em;"></span>
+      <button onclick="closeAdmin()" style="background:none;border:1px solid rgba(200,205,214,.15);color:rgba(248,244,255,.5);padding:7px 18px;font-family:'Syne',sans-serif;font-size:.54rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;transition:all .3s;">&#10005; Close</button>
+    </div>
   </div>
-  <div style="padding:36px;">
-    <!-- Stats -->
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:40px;">
-      <div style="background:rgba(255,255,255,.03);border:1px solid rgba(200,205,214,.07);padding:24px 20px;text-align:center;">
-        <div style="font-family:'Cormorant',serif;font-size:2.2rem;font-weight:300;background:linear-gradient(135deg,var(--gold),var(--orange));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;" id="adminStatOrders">0</div>
-        <div style="font-family:'Syne',sans-serif;font-size:.5rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:rgba(248,244,255,.3);margin-top:4px;">Total Orders</div>
+
+  <!-- Admin Nav Tabs -->
+  <div style="display:flex;gap:0;border-bottom:1px solid rgba(200,205,214,.07);background:rgba(0,0,0,.2);padding:0 28px;overflow-x:auto;">
+    <button class="admin-nav-tab active" onclick="showAdminSection('dashboard')" data-section="dashboard">📊 Dashboard</button>
+    <button class="admin-nav-tab" onclick="showAdminSection('products')" data-section="products">💎 Products</button>
+    <button class="admin-nav-tab" onclick="showAdminSection('orders')" data-section="orders">📦 Orders</button>
+    <button class="admin-nav-tab" onclick="showAdminSection('customers')" data-section="customers">👥 Customers</button>
+    <button class="admin-nav-tab" onclick="showAdminSection('coupons')" data-section="coupons">🎟️ Coupons</button>
+  </div>
+
+  <div style="padding:28px;">
+
+    <!-- ===== DASHBOARD SECTION ===== -->
+    <div id="adminSection_dashboard">
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:32px;">
+        <div class="admin-stat-card">
+          <div class="admin-stat-num" id="adminStatOrders">0</div>
+          <div class="admin-stat-label">Total Orders</div>
+        </div>
+        <div class="admin-stat-card">
+          <div class="admin-stat-num" style="background:linear-gradient(135deg,var(--cyan),var(--mint));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;" id="adminStatUsers">0</div>
+          <div class="admin-stat-label">Customers</div>
+        </div>
+        <div class="admin-stat-card">
+          <div class="admin-stat-num" style="background:linear-gradient(135deg,var(--mint),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;" id="adminStatRevenue">₹0</div>
+          <div class="admin-stat-label">Total Revenue</div>
+        </div>
+        <div class="admin-stat-card">
+          <div class="admin-stat-num" style="background:linear-gradient(135deg,var(--pink),var(--violet));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;" id="adminStatPending">0</div>
+          <div class="admin-stat-label">Pending Orders</div>
+        </div>
       </div>
-      <div style="background:rgba(255,255,255,.03);border:1px solid rgba(200,205,214,.07);padding:24px 20px;text-align:center;">
-        <div style="font-family:'Cormorant',serif;font-size:2.2rem;font-weight:300;background:linear-gradient(135deg,var(--cyan),var(--mint));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;" id="adminStatUsers">0</div>
-        <div style="font-family:'Syne',sans-serif;font-size:.5rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:rgba(248,244,255,.3);margin-top:4px;">Customers</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:32px;">
+        <div class="admin-stat-card">
+          <div class="admin-stat-num" style="background:linear-gradient(135deg,var(--gold),var(--orange));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;" id="adminStatProducts">0</div>
+          <div class="admin-stat-label">Total Products</div>
+        </div>
+        <div class="admin-stat-card">
+          <div class="admin-stat-num" style="background:linear-gradient(135deg,var(--mint),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;" id="adminStatViews">0</div>
+          <div class="admin-stat-label">Product Views</div>
+        </div>
+        <div class="admin-stat-card">
+          <div class="admin-stat-num" style="background:linear-gradient(135deg,var(--violet),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;" id="adminStatCoupons">0</div>
+          <div class="admin-stat-label">Active Coupons</div>
+        </div>
       </div>
-      <div style="background:rgba(255,255,255,.03);border:1px solid rgba(200,205,214,.07);padding:24px 20px;text-align:center;">
-        <div style="font-family:'Cormorant',serif;font-size:2.2rem;font-weight:300;background:linear-gradient(135deg,var(--mint),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;" id="adminStatRevenue">&#8377;0</div>
-        <div style="font-family:'Syne',sans-serif;font-size:.5rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:rgba(248,244,255,.3);margin-top:4px;">Total Revenue</div>
-      </div>
-      <div style="background:rgba(255,255,255,.03);border:1px solid rgba(200,205,214,.07);padding:24px 20px;text-align:center;">
-        <div style="font-family:'Cormorant',serif;font-size:2.2rem;font-weight:300;background:linear-gradient(135deg,var(--pink),var(--violet));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;" id="adminStatPending">0</div>
-        <div style="font-family:'Syne',sans-serif;font-size:.5rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:rgba(248,244,255,.3);margin-top:4px;">Pending Orders</div>
-      </div>
+      <!-- Recent Orders -->
+      <div class="admin-section-title">Recent Orders</div>
+      <div style="overflow-x:auto;"><table id="adminRecentOrders" class="admin-table"></table></div>
     </div>
-    <!-- Tabs -->
-    <div style="display:flex;gap:4px;margin-bottom:28px;border-bottom:1px solid rgba(200,205,214,.07);">
-      <button class="admin-tab active" data-tab="orders" onclick="showAdminTab('orders')" style="padding:10px 20px;background:none;border:none;font-family:'Syne',sans-serif;font-size:.58rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--sl);border-bottom:2px solid var(--sl);transition:all .3s;margin-bottom:-1px;">Orders</button>
-      <button class="admin-tab" data-tab="users" onclick="showAdminTab('users')" style="padding:10px 20px;background:none;border:none;font-family:'Syne',sans-serif;font-size:.58rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(248,244,255,.3);border-bottom:2px solid transparent;transition:all .3s;margin-bottom:-1px;">Customers</button>
+
+    <!-- ===== PRODUCTS SECTION ===== -->
+    <div id="adminSection_products" style="display:none;">
+      <!-- Product Actions Bar -->
+      <div style="display:flex;gap:10px;align-items:center;margin-bottom:20px;flex-wrap:wrap;">
+        <button class="admin-btn-primary" onclick="openProductForm()">+ Add Product</button>
+        <button class="admin-btn-secondary" onclick="openBulkUpload()">📤 Bulk Upload</button>
+        <input type="text" id="productSearch" placeholder="Search products..." oninput="filterProducts()" style="flex:1;min-width:200px;background:rgba(255,255,255,.04);border:1px solid rgba(200,205,214,.12);color:#fff;padding:9px 14px;font-family:'DM Sans',sans-serif;font-size:.7rem;outline:none;">
+        <select id="productCatFilter" onchange="filterProducts()" style="background:rgba(255,255,255,.04);border:1px solid rgba(200,205,214,.12);color:#fff;padding:9px 14px;font-family:'DM Sans',sans-serif;font-size:.7rem;outline:none;">
+          <option value="">All Categories</option>
+          <option value="women">Women's</option>
+          <option value="men">Men's</option>
+          <option value="unisex">Unisex</option>
+        </select>
+        <select id="productStatusFilter" onchange="filterProducts()" style="background:rgba(255,255,255,.04);border:1px solid rgba(200,205,214,.12);color:#fff;padding:9px 14px;font-family:'DM Sans',sans-serif;font-size:.7rem;outline:none;">
+          <option value="">All Status</option>
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
+        </select>
+      </div>
+      <!-- Products Grid -->
+      <div id="adminProductsGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;"></div>
     </div>
-    <!-- Table -->
-    <div style="overflow-x:auto;">
-      <table id="adminTableBody" style="width:100%;border-collapse:collapse;font-size:.65rem;"></table>
+
+    <!-- ===== ORDERS SECTION ===== -->
+    <div id="adminSection_orders" style="display:none;">
+      <div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;">
+        <select id="orderStatusFilter" onchange="loadAdminOrders()" style="background:rgba(255,255,255,.04);border:1px solid rgba(200,205,214,.12);color:#fff;padding:9px 14px;font-family:'DM Sans',sans-serif;font-size:.7rem;outline:none;">
+          <option value="">All Orders</option>
+          <option value="confirmed">Confirmed</option>
+          <option value="delivered">Delivered</option>
+          <option value="pending">Pending</option>
+        </select>
+      </div>
+      <div style="overflow-x:auto;"><table id="adminOrdersTable" class="admin-table"></table></div>
+    </div>
+
+    <!-- ===== CUSTOMERS SECTION ===== -->
+    <div id="adminSection_customers" style="display:none;">
+      <div style="overflow-x:auto;"><table id="adminCustomersTable" class="admin-table"></table></div>
+    </div>
+
+    <!-- ===== COUPONS SECTION ===== -->
+    <div id="adminSection_coupons" style="display:none;">
+      <div style="display:flex;gap:10px;margin-bottom:20px;">
+        <button class="admin-btn-primary" onclick="openCouponForm()">+ New Coupon</button>
+      </div>
+      <div id="adminCouponsList"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===== PRODUCT FORM MODAL ===== -->
+<div id="productFormModal" style="position:fixed;inset:0;z-index:9020;background:rgba(4,3,10,.92);backdrop-filter:blur(12px);display:none;overflow-y:auto;">
+  <div style="max-width:800px;margin:40px auto;background:linear-gradient(160deg,#0d0b18,#07050f);border:1px solid rgba(200,205,214,.12);padding:36px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;">
+      <div style="font-family:'Cormorant',serif;font-size:1.5rem;font-weight:300;" id="productFormTitle">Add Product</div>
+      <button onclick="closeProductForm()" style="background:none;border:1px solid rgba(200,205,214,.2);color:rgba(248,244,255,.6);width:32px;height:32px;border-radius:50%;font-size:.9rem;">✕</button>
+    </div>
+
+    <input type="hidden" id="pf_id">
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px;">
+      <div class="pf-field"><label>Product Name *</label><input type="text" id="pf_name" placeholder="e.g. Ruby Star Necklace"></div>
+      <div class="pf-field"><label>Category *</label>
+        <select id="pf_category">
+          <option value="women">Women's</option>
+          <option value="men">Men's</option>
+          <option value="unisex">Unisex</option>
+        </select>
+      </div>
+      <div class="pf-field"><label>Sale Price (₹) *</label><input type="number" id="pf_price" placeholder="2199"></div>
+      <div class="pf-field"><label>Original Price (₹)</label><input type="number" id="pf_original_price" placeholder="2999"></div>
+      <div class="pf-field"><label>Stock Quantity</label><input type="number" id="pf_stock" placeholder="10"></div>
+      <div class="pf-field"><label>Badge</label><input type="text" id="pf_badge" placeholder="e.g. Limited Edition, New, Hot"></div>
+    </div>
+
+    <div class="pf-field" style="margin-bottom:18px;"><label>Description *</label><textarea id="pf_description" rows="3" placeholder="Describe your product..."></textarea></div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px;">
+      <div class="pf-field"><label>Materials (comma separated)</label><input type="text" id="pf_materials" placeholder="18K Gold, Diamonds, Emeralds"></div>
+      <div class="pf-field"><label>Tags (comma separated)</label><input type="text" id="pf_tags" placeholder="bridal, bestseller, new"></div>
+    </div>
+
+    <div class="pf-field" style="margin-bottom:18px;"><label>Image URLs (one per line)</label><textarea id="pf_images" rows="3" placeholder="/public/product1.jpg&#10;https://example.com/image.jpg"></textarea></div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px;">
+      <div class="pf-field"><label>Care Instructions</label><input type="text" id="pf_care" placeholder="Avoid water, store in box"></div>
+      <div class="pf-field"><label>Weight (grams)</label><input type="number" id="pf_weight" placeholder="48.6"></div>
+    </div>
+
+    <div style="display:flex;gap:16px;align-items:center;margin-bottom:24px;">
+      <label style="display:flex;align-items:center;gap:8px;font-family:'Syne',sans-serif;font-size:.56rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:rgba(248,244,255,.5);cursor:pointer;">
+        <input type="checkbox" id="pf_active" checked style="width:16px;height:16px;accent-color:var(--mint);"> Active (visible on site)
+      </label>
+      <label style="display:flex;align-items:center;gap:8px;font-family:'Syne',sans-serif;font-size:.56rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:rgba(248,244,255,.5);cursor:pointer;">
+        <input type="checkbox" id="pf_featured" style="width:16px;height:16px;accent-color:var(--gold);"> Featured Product
+      </label>
+    </div>
+
+    <div style="display:flex;gap:12px;">
+      <button onclick="saveProduct()" class="admin-btn-primary" style="flex:1;padding:14px;">💾 Save Product</button>
+      <button onclick="closeProductForm()" class="admin-btn-secondary" style="padding:14px 24px;">Cancel</button>
     </div>
   </div>
 </div>
+
+<!-- ===== BULK UPLOAD MODAL ===== -->
+<div id="bulkUploadModal" style="position:fixed;inset:0;z-index:9020;background:rgba(4,3,10,.92);backdrop-filter:blur(12px);display:none;overflow-y:auto;">
+  <div style="max-width:700px;margin:40px auto;background:linear-gradient(160deg,#0d0b18,#07050f);border:1px solid rgba(200,205,214,.12);padding:36px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
+      <div style="font-family:'Cormorant',serif;font-size:1.5rem;font-weight:300;">Bulk Upload Products</div>
+      <button onclick="closeBulkUpload()" style="background:none;border:1px solid rgba(200,205,214,.2);color:rgba(248,244,255,.6);width:32px;height:32px;border-radius:50%;font-size:.9rem;">✕</button>
+    </div>
+    <p style="font-size:.62rem;color:rgba(248,244,255,.35);margin-bottom:16px;">Paste JSON array of products below. Each product should have: name, category, price, description, images (array), materials (array).</p>
+    <div style="background:rgba(0,200,122,.06);border:1px solid rgba(0,200,122,.2);padding:12px 16px;margin-bottom:16px;font-family:monospace;font-size:.6rem;color:rgba(0,200,122,.8);">
+      [{"name":"Ring Name","category":"women","price":1999,"description":"Description","materials":["Gold","Diamond"],"images":["/public/img.jpg"],"stock_quantity":5}]
+    </div>
+    <textarea id="bulkJsonInput" rows="10" placeholder='[{"name":"...","category":"women","price":1999,...}]' style="width:100%;background:rgba(255,255,255,.03);border:1px solid rgba(200,205,214,.12);color:#fff;padding:12px;font-family:monospace;font-size:.65rem;resize:vertical;outline:none;margin-bottom:16px;"></textarea>
+    <div style="display:flex;gap:12px;">
+      <button onclick="processBulkUpload()" class="admin-btn-primary" style="flex:1;padding:14px;">📤 Upload All Products</button>
+      <button onclick="closeBulkUpload()" class="admin-btn-secondary" style="padding:14px 24px;">Cancel</button>
+    </div>
+    <div id="bulkUploadResult" style="margin-top:16px;"></div>
+  </div>
+</div>
+
+<!-- ===== COUPON FORM MODAL ===== -->
+<div id="couponFormModal" style="position:fixed;inset:0;z-index:9020;background:rgba(4,3,10,.92);backdrop-filter:blur(12px);display:none;">
+  <div style="max-width:500px;margin:80px auto;background:linear-gradient(160deg,#0d0b18,#07050f);border:1px solid rgba(200,205,214,.12);padding:36px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
+      <div style="font-family:'Cormorant',serif;font-size:1.5rem;font-weight:300;">New Coupon</div>
+      <button onclick="closeCouponForm()" style="background:none;border:1px solid rgba(200,205,214,.2);color:rgba(248,244,255,.6);width:32px;height:32px;border-radius:50%;font-size:.9rem;">✕</button>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:16px;">
+      <div class="pf-field"><label>Coupon Code *</label><input type="text" id="cp_code" placeholder="SAVE20" style="text-transform:uppercase;"></div>
+      <div class="pf-field"><label>Discount Type</label>
+        <select id="cp_type">
+          <option value="percent">Percentage (%)</option>
+          <option value="fixed">Fixed Amount (₹)</option>
+        </select>
+      </div>
+      <div class="pf-field"><label>Discount Value *</label><input type="number" id="cp_value" placeholder="20"></div>
+      <div class="pf-field"><label>Min Order Amount (₹)</label><input type="number" id="cp_min" placeholder="500"></div>
+      <div class="pf-field"><label>Max Uses</label><input type="number" id="cp_max_uses" placeholder="100"></div>
+      <div class="pf-field"><label>Expires At (optional)</label><input type="datetime-local" id="cp_expires"></div>
+      <button onclick="saveCoupon()" class="admin-btn-primary" style="padding:14px;">💾 Create Coupon</button>
+    </div>
+  </div>
+</div>
+
 <style>
-#adminModal.open{opacity:1!important;visibility:visible!important;display:block!important;}
-.admin-tab.active{color:var(--sl)!important;border-bottom-color:var(--sl)!important;}
-#adminTableBody th{font-family:'Syne',sans-serif;font-size:.5rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:rgba(248,244,255,.3);padding:10px 14px;text-align:left;border-bottom:1px solid rgba(200,205,214,.07);}
-#adminTableBody td{font-size:.65rem;padding:14px;border-bottom:1px solid rgba(200,205,214,.04);color:rgba(248,244,255,.65);}
-#adminTableBody tr:hover td{background:rgba(200,205,214,.02);}
+#adminModal.open{opacity:1!important;visibility:visible!important;}
+
+/* Admin Nav Tabs */
+.admin-nav-tab{background:none;border:none;border-bottom:2px solid transparent;padding:16px 20px;font-family:'Syne',sans-serif;font-size:.56rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(248,244,255,.3);transition:all .3s;white-space:nowrap;cursor:pointer;}
+.admin-nav-tab:hover{color:rgba(248,244,255,.6);}
+.admin-nav-tab.active{color:var(--sl);border-bottom-color:var(--sl);}
+
+/* Admin Stat Cards */
+.admin-stat-card{background:rgba(255,255,255,.03);border:1px solid rgba(200,205,214,.07);padding:24px 20px;text-align:center;transition:border-color .3s;}
+.admin-stat-card:hover{border-color:rgba(200,205,214,.18);}
+.admin-stat-num{font-family:'Cormorant',serif;font-size:2.2rem;font-weight:300;background:linear-gradient(135deg,var(--gold),var(--orange));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.admin-stat-label{font-family:'Syne',sans-serif;font-size:.5rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:rgba(248,244,255,.3);margin-top:4px;}
+
+/* Admin Table */
+.admin-table{width:100%;border-collapse:collapse;font-size:.65rem;}
+.admin-table th{font-family:'Syne',sans-serif;font-size:.5rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:rgba(248,244,255,.3);padding:10px 14px;text-align:left;border-bottom:1px solid rgba(200,205,214,.07);}
+.admin-table td{font-size:.65rem;padding:12px 14px;border-bottom:1px solid rgba(200,205,214,.04);color:rgba(248,244,255,.65);vertical-align:middle;}
+.admin-table tr:hover td{background:rgba(200,205,214,.02);}
+
+/* Admin Buttons */
+.admin-btn-primary{font-family:'Syne',sans-serif;font-size:.58rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;border:none;padding:10px 20px;color:#04030a;background:linear-gradient(135deg,#c8cdd6,#fff);clip-path:polygon(6px 0%,100% 0%,calc(100% - 6px) 100%,0% 100%);cursor:pointer;transition:all .3s;}
+.admin-btn-primary:hover{box-shadow:0 0 20px rgba(232,234,238,.2);}
+.admin-btn-secondary{font-family:'Syne',sans-serif;font-size:.58rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;border:1px solid rgba(200,205,214,.2);padding:10px 20px;color:rgba(248,244,255,.5);background:none;clip-path:polygon(6px 0%,100% 0%,calc(100% - 6px) 100%,0% 100%);cursor:pointer;transition:all .3s;}
+.admin-btn-secondary:hover{border-color:var(--sl);color:var(--sl);}
+.admin-btn-danger{font-family:'Syne',sans-serif;font-size:.52rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;border:1px solid rgba(232,41,74,.3);padding:6px 12px;color:rgba(232,41,74,.8);background:rgba(232,41,74,.06);cursor:pointer;transition:all .3s;}
+.admin-btn-edit{font-family:'Syne',sans-serif;font-size:.52rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;border:1px solid rgba(200,205,214,.2);padding:6px 12px;color:rgba(248,244,255,.5);background:none;cursor:pointer;transition:all .3s;}
+
+/* Admin Badge */
 .admin-badge{font-family:'Syne',sans-serif;font-size:.44rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;}
+.status-confirmed{background:rgba(0,200,122,.12);color:rgba(0,200,122,.9);border:1px solid rgba(0,200,122,.3);}
+.status-pending{background:rgba(255,215,0,.1);color:rgba(255,215,0,.9);border:1px solid rgba(255,215,0,.25);}
+.status-delivered{background:rgba(0,245,255,.1);color:rgba(0,245,255,.9);border:1px solid rgba(0,245,255,.25);}
+
+/* Product Card in Admin */
+.admin-product-card{background:rgba(255,255,255,.03);border:1px solid rgba(200,205,214,.07);overflow:hidden;transition:border-color .3s;}
+.admin-product-card:hover{border-color:rgba(200,205,214,.18);}
+.admin-product-img{width:100%;height:160px;object-fit:cover;background:rgba(255,255,255,.03);}
+.admin-product-body{padding:14px;}
+
+/* Section Title */
+.admin-section-title{font-family:'Syne',sans-serif;font-size:.6rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--silver);margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid rgba(200,205,214,.07);}
+
+/* Product Form Fields */
+.pf-field{display:flex;flex-direction:column;gap:6px;}
+.pf-field label{font-family:'Syne',sans-serif;font-size:.5rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:rgba(248,244,255,.28);}
+.pf-field input,.pf-field select,.pf-field textarea{font-family:'DM Sans',sans-serif;font-size:.72rem;color:#fff;background:rgba(255,255,255,.04);border:1px solid rgba(200,205,214,.12);padding:10px 12px;outline:none;transition:border-color .3s;-webkit-appearance:none;resize:vertical;}
+.pf-field input:focus,.pf-field select:focus,.pf-field textarea:focus{border-color:var(--sl);}
+.pf-field input::placeholder,.pf-field textarea::placeholder{color:rgba(248,244,255,.2);}
+.pf-field select option{background:#0d0b18;}
 </style>
 
 
 <script>
+
 window.onerror=function(){return true;};
 
 // ===== SUPABASE INIT =====
@@ -1214,6 +1440,8 @@ function openCheckout(){
     if(fn)fn.value=currentUser.name||'';
     if(em)em.value=currentUser.email||'';
   }
+  window._appliedCoupon = null;
+  if(document.getElementById('couponInput')) document.getElementById('couponInput').value = '';
   document.getElementById('coModal').classList.add('open');
   document.getElementById('bd').classList.add('open');
 }
@@ -1713,6 +1941,485 @@ document.addEventListener('DOMContentLoaded', function(){
     });
   });
 });
+
+// ===== ADMIN PANEL SYSTEM =====
+var adminCurrentSection = 'dashboard';
+var allProducts = [];
+var allOrders = [];
+var allUsers = [];
+
+// Live clock
+setInterval(function(){
+  var el = document.getElementById('adminLiveTime');
+  if(el) el.textContent = new Date().toLocaleTimeString('en-IN');
+}, 1000);
+
+function showAdminSection(section) {
+  adminCurrentSection = section;
+  document.querySelectorAll('[id^="adminSection_"]').forEach(function(el){ el.style.display='none'; });
+  var target = document.getElementById('adminSection_' + section);
+  if(target) target.style.display = 'block';
+  document.querySelectorAll('.admin-nav-tab').forEach(function(t){ t.classList.toggle('active', t.dataset.section === section); });
+  if(section === 'dashboard') loadAdminDashboard();
+  else if(section === 'products') loadAdminProducts();
+  else if(section === 'orders') loadAdminOrders();
+  else if(section === 'customers') loadAdminCustomers();
+  else if(section === 'coupons') loadAdminCoupons();
+}
+
+async function openAdmin() {
+  if(!currentUser){ showToast('Please login first','err'); return; }
+  var uEmail = (currentUser.email||'').toLowerCase().trim();
+  var aEmail = (ADMIN_EMAIL||'').toLowerCase().trim();
+  if(uEmail !== aEmail){ showToast('Access denied','err'); return; }
+  var m = document.getElementById('adminModal');
+  if(!m) return;
+  m.style.opacity='1'; m.style.visibility='visible'; m.classList.add('open');
+  showAdminSection('dashboard');
+}
+
+function closeAdmin() {
+  var m = document.getElementById('adminModal');
+  if(m){ m.classList.remove('open'); m.style.opacity='0'; m.style.visibility='hidden'; }
+}
+
+// ===== DASHBOARD =====
+async function loadAdminDashboard() {
+  try {
+    var [ordRes, usrRes, prodRes, viewRes, cpnRes] = await Promise.all([
+      sb.from('orders').select('*').order('created_at',{ascending:false}),
+      sb.from('users').select('*'),
+      sb.from('products').select('*'),
+      sb.from('product_views').select('id', {count:'exact'}),
+      sb.from('coupons').select('*').eq('is_active',true)
+    ]);
+    allOrders = ordRes.data || [];
+    allUsers = usrRes.data || [];
+    allProducts = prodRes.data || [];
+    var totalRevenue = allOrders.reduce(function(s,o){ var a=o.total||0; if(a>100000) a=Math.round(a/100); return s+a; }, 0);
+    document.getElementById('adminStatOrders').textContent = allOrders.length;
+    document.getElementById('adminStatUsers').textContent = allUsers.length;
+    document.getElementById('adminStatRevenue').innerHTML = '₹'+totalRevenue.toLocaleString('en-IN');
+    document.getElementById('adminStatPending').textContent = allOrders.filter(function(o){ return o.order_status!=='delivered'; }).length;
+    document.getElementById('adminStatProducts').textContent = allProducts.length;
+    document.getElementById('adminStatViews').textContent = (viewRes.count||0);
+    document.getElementById('adminStatCoupons').textContent = (cpnRes.data||[]).length;
+    // Recent orders table
+    var rows = allOrders.slice(0,10).map(function(o){
+      var sc = o.order_status==='confirmed'?'status-confirmed':o.order_status==='delivered'?'status-delivered':'status-pending';
+      var date = new Date(o.created_at).toLocaleDateString('en-IN');
+      return '<tr><td>'+o.order_number+'</td><td>'+o.customer_name+'</td><td>₹'+o.total.toLocaleString('en-IN')+'</td><td>'+(o.payment_method||'').toUpperCase()+'</td><td><span class="admin-badge '+sc+'">'+o.order_status.toUpperCase()+'</span></td><td>'+date+'</td></tr>';
+    }).join('');
+    document.getElementById('adminRecentOrders').innerHTML = '<thead><tr><th>Order #</th><th>Customer</th><th>Amount</th><th>Payment</th><th>Status</th><th>Date</th></tr></thead><tbody>'+rows+'</tbody>';
+  } catch(e) { console.error('Dashboard load error:', e); }
+}
+
+// ===== PRODUCTS =====
+async function loadAdminProducts() {
+  try {
+    var res = await sb.from('products').select('*').order('created_at',{ascending:false});
+    allProducts = res.data || [];
+    renderProductsGrid(allProducts);
+  } catch(e) { console.error(e); }
+}
+
+function renderProductsGrid(products) {
+  var grid = document.getElementById('adminProductsGrid');
+  if(!products.length){ grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:60px;color:rgba(248,244,255,.25);font-family:Cormorant,serif;font-style:italic;font-size:1.1rem;">No products yet. Click + Add Product!</div>'; return; }
+  grid.innerHTML = products.map(function(p) {
+    var img = (p.images && p.images[0]) ? p.images[0] : '';
+    var statusColor = p.is_active ? 'rgba(0,200,122,.9)' : 'rgba(232,41,74,.7)';
+    var statusLabel = p.is_active ? 'Active' : 'Inactive';
+    var discount = p.original_price > p.price ? Math.round((1 - p.price/p.original_price)*100)+'% OFF' : '';
+    return '<div class="admin-product-card">'
+      + (img ? '<img class="admin-product-img" src="'+img+'" onerror="this.style.display='none'">' : '<div class="admin-product-img" style="display:flex;align-items:center;justify-content:center;color:rgba(248,244,255,.2);font-size:2rem;">💎</div>')
+      + '<div class="admin-product-body">'
+      + '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">'
+      + '<div style="font-family:Cormorant,serif;font-size:1rem;">' + p.name + '</div>'
+      + '<span style="font-size:.48rem;font-family:Syne,sans-serif;font-weight:700;padding:3px 8px;background:'+statusColor+';color:#000;letter-spacing:.1em;text-transform:uppercase;">'+statusLabel+'</span>'
+      + '</div>'
+      + '<div style="font-size:.55rem;color:rgba(248,244,255,.35);text-transform:uppercase;letter-spacing:.12em;margin-bottom:8px;">' + p.category + (p.is_featured ? ' · ⭐ Featured' : '') + '</div>'
+      + '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">'
+      + '<span style="font-family:Cormorant,serif;font-size:1.1rem;">₹'+p.price.toLocaleString('en-IN')+'</span>'
+      + (p.original_price > p.price ? '<span style="font-size:.6rem;text-decoration:line-through;color:rgba(248,244,255,.3);">₹'+p.original_price.toLocaleString('en-IN')+'</span><span style="font-size:.52rem;color:rgba(0,200,122,.8);">'+discount+'</span>' : '')
+      + '</div>'
+      + '<div style="font-size:.58rem;color:rgba(248,244,255,.35);margin-bottom:12px;">Stock: '+p.stock_quantity+' | Views: '+(p.view_count||0)+'</div>'
+      + '<div style="display:flex;gap:8px;flex-wrap:wrap;">'
+      + '<button class="admin-btn-edit" onclick="editProduct(''+p.id+'')">✏️ Edit</button>'
+      + '<button class="admin-btn-edit" onclick="toggleProductStatus(''+p.id+'','+p.is_active+')">'+(p.is_active?'🔴 Deactivate':'🟢 Activate')+'</button>'
+      + '<button class="admin-btn-danger" onclick="deleteProduct(''+p.id+'',''+p.name.replace(/'/g,"\'")+'')" >🗑️ Delete</button>'
+      + '</div></div></div>';
+  }).join('');
+}
+
+function filterProducts() {
+  var search = (document.getElementById('productSearch').value||'').toLowerCase();
+  var cat = document.getElementById('productCatFilter').value;
+  var status = document.getElementById('productStatusFilter').value;
+  var filtered = allProducts.filter(function(p) {
+    var matchSearch = !search || p.name.toLowerCase().includes(search) || (p.description||'').toLowerCase().includes(search);
+    var matchCat = !cat || p.category === cat;
+    var matchStatus = !status || (status==='active' ? p.is_active : !p.is_active);
+    return matchSearch && matchCat && matchStatus;
+  });
+  renderProductsGrid(filtered);
+}
+
+// Product Form
+function openProductForm(product) {
+  document.getElementById('productFormTitle').textContent = product ? 'Edit Product' : 'Add Product';
+  document.getElementById('pf_id').value = product ? product.id : '';
+  document.getElementById('pf_name').value = product ? product.name : '';
+  document.getElementById('pf_category').value = product ? product.category : 'women';
+  document.getElementById('pf_price').value = product ? product.price : '';
+  document.getElementById('pf_original_price').value = product ? (product.original_price||'') : '';
+  document.getElementById('pf_stock').value = product ? product.stock_quantity : '';
+  document.getElementById('pf_badge').value = product ? (product.badge||'') : '';
+  document.getElementById('pf_description').value = product ? (product.description||'') : '';
+  document.getElementById('pf_materials').value = product ? (product.materials||[]).join(', ') : '';
+  document.getElementById('pf_tags').value = product ? (product.tags||[]).join(', ') : '';
+  document.getElementById('pf_images').value = product ? (product.images||[]).join('
+') : '';
+  document.getElementById('pf_care').value = product ? (product.care_instructions||'') : '';
+  document.getElementById('pf_weight').value = product ? (product.weight_grams||'') : '';
+  document.getElementById('pf_active').checked = product ? product.is_active : true;
+  document.getElementById('pf_featured').checked = product ? product.is_featured : false;
+  document.getElementById('productFormModal').style.display = 'block';
+}
+
+function closeProductForm() { document.getElementById('productFormModal').style.display = 'none'; }
+
+function editProduct(id) {
+  var p = allProducts.find(function(p){ return p.id === id; });
+  if(p) openProductForm(p);
+}
+
+async function saveProduct() {
+  var id = document.getElementById('pf_id').value;
+  var name = document.getElementById('pf_name').value.trim();
+  var category = document.getElementById('pf_category').value;
+  var price = parseFloat(document.getElementById('pf_price').value);
+  if(!name || !price){ showToast('Name and price are required','err'); return; }
+  var originalPrice = parseFloat(document.getElementById('pf_original_price').value)||price;
+  var slug = name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'') + '-' + Date.now();
+  var data = {
+    name: name,
+    slug: id ? undefined : slug,
+    category: category,
+    price: price,
+    original_price: originalPrice,
+    discount_percent: originalPrice > price ? Math.round((1-price/originalPrice)*100) : 0,
+    description: document.getElementById('pf_description').value.trim(),
+    materials: document.getElementById('pf_materials').value.split(',').map(function(s){ return s.trim(); }).filter(Boolean),
+    tags: document.getElementById('pf_tags').value.split(',').map(function(s){ return s.trim(); }).filter(Boolean),
+    images: document.getElementById('pf_images').value.split('
+').map(function(s){ return s.trim(); }).filter(Boolean),
+    stock_quantity: parseInt(document.getElementById('pf_stock').value)||0,
+    badge: document.getElementById('pf_badge').value.trim()||null,
+    care_instructions: document.getElementById('pf_care').value.trim()||null,
+    weight_grams: parseFloat(document.getElementById('pf_weight').value)||null,
+    is_active: document.getElementById('pf_active').checked,
+    is_featured: document.getElementById('pf_featured').checked,
+    updated_at: new Date().toISOString()
+  };
+  if(id) delete data.slug;
+  try {
+    if(id) {
+      var {error} = await sb.from('products').update(data).eq('id',id);
+      if(error) throw error;
+      showToast('Product updated! ✦');
+    } else {
+      var {error:e2} = await sb.from('products').insert([data]);
+      if(e2) throw e2;
+      showToast('Product added! ✦');
+    }
+    closeProductForm();
+    loadAdminProducts();
+    // Refresh site products
+    loadSiteProducts();
+  } catch(err) { showToast('Error: '+err.message,'err'); }
+}
+
+async function toggleProductStatus(id, currentStatus) {
+  try {
+    await sb.from('products').update({is_active: !currentStatus}).eq('id',id);
+    showToast(currentStatus ? 'Product deactivated' : 'Product activated ✦');
+    loadAdminProducts();
+    loadSiteProducts();
+  } catch(e) { showToast('Error','err'); }
+}
+
+async function deleteProduct(id, name) {
+  if(!confirm('Delete "'+name+'"? This cannot be undone!')) return;
+  try {
+    await sb.from('products').delete().eq('id',id);
+    showToast('Product deleted');
+    loadAdminProducts();
+    loadSiteProducts();
+  } catch(e) { showToast('Error','err'); }
+}
+
+// ===== BULK UPLOAD =====
+function openBulkUpload() { document.getElementById('bulkUploadModal').style.display='block'; }
+function closeBulkUpload() { document.getElementById('bulkUploadModal').style.display='none'; }
+
+async function processBulkUpload() {
+  var json = document.getElementById('bulkJsonInput').value.trim();
+  var result = document.getElementById('bulkUploadResult');
+  try {
+    var products = JSON.parse(json);
+    if(!Array.isArray(products)) throw new Error('Must be an array');
+    result.innerHTML = '<div style="color:rgba(0,200,122,.8);font-size:.62rem;">Uploading '+products.length+' products...</div>';
+    var success = 0, failed = 0;
+    for(var i=0; i<products.length; i++) {
+      var p = products[i];
+      var slug = (p.name||'product').toLowerCase().replace(/[^a-z0-9]+/g,'-')+'-'+Date.now()+'-'+i;
+      try {
+        await sb.from('products').insert([{
+          name: p.name, slug: slug, category: p.category||'unisex',
+          price: p.price||0, original_price: p.original_price||p.price||0,
+          description: p.description||'', materials: p.materials||[],
+          tags: p.tags||[], images: p.images||[],
+          stock_quantity: p.stock_quantity||0, badge: p.badge||null,
+          is_active: p.is_active !== false, is_featured: p.is_featured||false
+        }]);
+        success++;
+      } catch(e) { failed++; }
+    }
+    result.innerHTML = '<div style="color:rgba(0,200,122,.8);font-size:.62rem;">✦ Uploaded: '+success+' | Failed: '+failed+'</div>';
+    loadAdminProducts();
+    loadSiteProducts();
+  } catch(e) {
+    result.innerHTML = '<div style="color:rgba(232,41,74,.8);font-size:.62rem;">Error: '+e.message+'</div>';
+  }
+}
+
+// ===== ORDERS =====
+async function loadAdminOrders() {
+  try {
+    var statusFilter = document.getElementById('orderStatusFilter') ? document.getElementById('orderStatusFilter').value : '';
+    var query = sb.from('orders').select('*').order('created_at',{ascending:false});
+    if(statusFilter) query = query.eq('order_status', statusFilter);
+    var {data:orders} = await query;
+    allOrders = orders||[];
+    var rows = allOrders.map(function(o){
+      var sc = o.order_status==='confirmed'?'status-confirmed':o.order_status==='delivered'?'status-delivered':'status-pending';
+      var items = Array.isArray(o.items) ? o.items.map(function(i){return i.name+' x'+i.qty;}).join(', ') : '';
+      var date = new Date(o.created_at).toLocaleDateString('en-IN');
+      return '<tr><td>'+o.order_number+'</td><td>'+o.customer_name+'</td><td style="font-size:.58rem;">'+o.customer_phone+'</td><td>'+items+'</td><td>₹'+o.total.toLocaleString('en-IN')+'</td><td>'+(o.payment_method||'').toUpperCase()+'</td><td><span class="admin-badge '+sc+'">'+o.order_status.toUpperCase()+'</span></td><td>'+date+'</td>'
+        +'<td><select onchange="updateOrderStatus(''+o.id+'',this.value)" style="background:rgba(255,255,255,.04);border:1px solid rgba(200,205,214,.12);color:#fff;padding:4px 8px;font-size:.55rem;outline:none;">'
+        +'<option value="confirmed" '+(o.order_status==='confirmed'?'selected':'')+'>Confirmed</option>'
+        +'<option value="shipped" '+(o.order_status==='shipped'?'selected':'')+'>Shipped</option>'
+        +'<option value="delivered" '+(o.order_status==='delivered'?'selected':'')+'>Delivered</option>'
+        +'<option value="cancelled" '+(o.order_status==='cancelled'?'selected':'')+'>Cancelled</option>'
+        +'</select></td></tr>';
+    }).join('');
+    document.getElementById('adminOrdersTable').innerHTML = '<thead><tr><th>Order #</th><th>Customer</th><th>Phone</th><th>Items</th><th>Amount</th><th>Payment</th><th>Status</th><th>Date</th><th>Update</th></tr></thead><tbody>'+rows+'</tbody>';
+  } catch(e) { console.error(e); }
+}
+
+async function updateOrderStatus(orderId, status) {
+  try {
+    await sb.from('orders').update({order_status: status}).eq('id', orderId);
+    showToast('Order updated to '+status+' ✦');
+  } catch(e) { showToast('Error updating order','err'); }
+}
+
+// ===== CUSTOMERS =====
+async function loadAdminCustomers() {
+  try {
+    var {data:users} = await sb.from('users').select('*').order('created_at',{ascending:false});
+    allUsers = users||[];
+    var rows = allUsers.map(function(u){
+      var date = new Date(u.created_at).toLocaleDateString('en-IN');
+      var verified = u.is_verified ? '<span class="admin-badge status-confirmed">VERIFIED</span>' : '<span class="admin-badge status-pending">PENDING</span>';
+      return '<tr><td>'+u.name+'</td><td>'+u.email+'</td><td>'+(u.phone||'-')+'</td><td>'+verified+'</td><td>'+date+'</td></tr>';
+    }).join('');
+    document.getElementById('adminCustomersTable').innerHTML = '<thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Status</th><th>Joined</th></tr></thead><tbody>'+rows+'</tbody>';
+  } catch(e) { console.error(e); }
+}
+
+// ===== COUPONS =====
+async function loadAdminCoupons() {
+  try {
+    var {data:coupons} = await sb.from('coupons').select('*').order('created_at',{ascending:false});
+    var list = document.getElementById('adminCouponsList');
+    if(!(coupons||[]).length){ list.innerHTML='<div style="text-align:center;padding:40px;color:rgba(248,244,255,.25);font-family:Cormorant,serif;font-style:italic;">No coupons yet. Create one!</div>'; return; }
+    list.innerHTML = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;">'
+      + coupons.map(function(c){
+        var expiry = c.expires_at ? 'Expires: '+new Date(c.expires_at).toLocaleDateString('en-IN') : 'No expiry';
+        var isExpired = c.expires_at && new Date(c.expires_at) < new Date();
+        return '<div style="background:rgba(255,255,255,.03);border:1px solid rgba(200,205,214,.09);padding:20px;">'
+          +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">'
+          +'<div style="font-family:Syne,sans-serif;font-size:.8rem;font-weight:700;letter-spacing:.12em;color:var(--gold);">'+c.code+'</div>'
+          +'<span style="font-size:.48rem;font-family:Syne,sans-serif;font-weight:700;padding:3px 8px;background:'+(c.is_active&&!isExpired?'rgba(0,200,122,.12)':'rgba(232,41,74,.12)')+';color:'+(c.is_active&&!isExpired?'rgba(0,200,122,.9)':'rgba(232,41,74,.8)')+';border:1px solid '+(c.is_active&&!isExpired?'rgba(0,200,122,.3)':'rgba(232,41,74,.3)')+';">'+(c.is_active&&!isExpired?'ACTIVE':'INACTIVE')+'</span>'
+          +'</div>'
+          +'<div style="font-size:.65rem;color:rgba(248,244,255,.55);margin-bottom:4px;">'+(c.discount_type==='percent'?c.discount_value+'% off':'₹'+c.discount_value+' off')+'</div>'
+          +'<div style="font-size:.58rem;color:rgba(248,244,255,.3);margin-bottom:4px;">Min order: ₹'+(c.min_order_amount||0)+'</div>'
+          +'<div style="font-size:.58rem;color:rgba(248,244,255,.3);margin-bottom:12px;">Used: '+c.used_count+' / '+c.max_uses+' · '+expiry+'</div>'
+          +'<button class="admin-btn-danger" onclick="deleteCoupon(''+c.id+'')">🗑️ Delete</button>'
+          +'</div>';
+      }).join('')+'</div>';
+  } catch(e) { console.error(e); }
+}
+
+function openCouponForm() { document.getElementById('couponFormModal').style.display='block'; }
+function closeCouponForm() { document.getElementById('couponFormModal').style.display='none'; }
+
+async function saveCoupon() {
+  var code = (document.getElementById('cp_code').value||'').trim().toUpperCase();
+  var value = parseFloat(document.getElementById('cp_value').value);
+  if(!code || !value){ showToast('Code and value required','err'); return; }
+  try {
+    await sb.from('coupons').insert([{
+      code: code,
+      discount_type: document.getElementById('cp_type').value,
+      discount_value: value,
+      min_order_amount: parseFloat(document.getElementById('cp_min').value)||0,
+      max_uses: parseInt(document.getElementById('cp_max_uses').value)||100,
+      expires_at: document.getElementById('cp_expires').value || null,
+      is_active: true
+    }]);
+    showToast('Coupon created! ✦');
+    closeCouponForm();
+    loadAdminCoupons();
+  } catch(e) { showToast('Error: '+(e.message.includes('duplicate')?'Code already exists':e.message),'err'); }
+}
+
+async function deleteCoupon(id) {
+  if(!confirm('Delete this coupon?')) return;
+  await sb.from('coupons').delete().eq('id',id);
+  showToast('Coupon deleted');
+  loadAdminCoupons();
+}
+
+// ===== LOAD PRODUCTS ON SITE (from Supabase) =====
+async function loadSiteProducts() {
+  try {
+    var {data:products} = await sb.from('products').select('*').eq('is_active',true).order('created_at',{ascending:false});
+    if(!products || !products.length) return;
+    // Update each section
+    ['women','men','unisex'].forEach(function(cat) {
+      var grid = document.querySelector('#'+cat+' .pgrid');
+      if(!grid) return;
+      var catProds = products.filter(function(p){ return p.category===cat; });
+      if(!catProds.length) return;
+      // Clear existing non-placeholder cards and add product cards
+      var placeholders = Array.from(grid.querySelectorAll('.pc')).filter(function(el){ return el.querySelector('.pph'); });
+      catProds.forEach(function(p, i) {
+        var imgSrc = (p.images && p.images[0]) ? p.images[0] : 'https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0?w=400&q=80';
+        var imgs = p.images || [imgSrc];
+        var discount = p.original_price > p.price ? '<div style="position:absolute;top:10px;right:10px;background:rgba(232,41,74,.9);color:#fff;font-family:Syne,sans-serif;font-size:.46rem;font-weight:700;letter-spacing:.1em;padding:3px 8px;z-index:2;">'+Math.round((1-p.price/p.original_price)*100)+'% OFF</div>' : '';
+        var badge = p.badge ? '<div class="pribbon">'+p.badge+'</div>' : '';
+        var materials = (p.materials||[]).map(function(m){ return '<span class="pmat">'+m+'</span>'; }).join('');
+        var carId = 'car_'+p.id.substring(0,8);
+        var dotsId = 'd_'+p.id.substring(0,8);
+        var slides = imgs.map(function(img,si){ return '<img class="pslide'+(si===0?' active':'')+'" src="'+img+'" alt="'+p.name+'" loading="'+(si===0?'eager':'lazy')+'" onerror="this.src='https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0?w=400&q=80'"/>'; }).join('');
+        var dots = imgs.length > 1 ? '<div class="pdots" id="'+dotsId+'">'+imgs.map(function(_,di){ return '<span class="pdot'+(di===0?' active':'')+'" onclick="goSlide(''+carId+'',''+dotsId+'','+di+')"></span>'; }).join('')+'</div>' : '';
+        var arrows = imgs.length > 1 ? '<button class="parr parr-l" onclick="prevSlide(''+carId+'',''+dotsId+'')">&#8249;</button><button class="parr parr-r" onclick="nextSlide(''+carId+'',''+dotsId+'')">&#8250;</button>' : '';
+        var card = document.createElement('div');
+        card.className = 'pc';
+        card.dataset.productId = p.id;
+        card.innerHTML = '<div class="pcw">'
+          +badge+discount
+          +'<button class="pwish" onclick="toggleWish(this)">&#9825;</button>'
+          +'<div class="pcar" id="'+carId+'">'+slides+'</div>'
+          +dots+arrows
+          +'<div class="pov"><button class="pqv" onclick="openProductQV(''+p.id+'')">Quick View</button></div>'
+          +'</div>'
+          +'<div class="pinfo">'
+          +'<div class="ptag">'+cat.charAt(0).toUpperCase()+cat.slice(1)+''s &middot; Jewellery</div>'
+          +'<div class="pname">'+p.name+'</div>'
+          +'<div class="pmats">'+materials+'</div>'
+          +'<div class="pdesc">'+((p.description||'').substring(0,80)+(p.description&&p.description.length>80?'...':''))+'</div>'
+          +'<div class="pfoot">'
+          +'<div class="pprice">&#8377;'+p.price.toLocaleString('en-IN')+'</div>'
+          +(p.original_price>p.price?'<div style="font-size:.58rem;text-decoration:line-through;color:rgba(248,244,255,.3);">&#8377;'+p.original_price.toLocaleString('en-IN')+'</div>':'')
+          +'<button class="padd" onclick="addProductToCart(this,''+p.id+'')">Add +</button>'
+          +'</div></div>'
+          +'<button class="patc" onclick="addProductToCart(this,''+p.id+'')">'
+          +'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>'
+          +'Add to Cart</button>';
+        // Replace placeholder or append
+        if(placeholders[i]) {
+          grid.replaceChild(card, placeholders[i]);
+        } else {
+          grid.appendChild(card);
+        }
+        // Track view
+        trackProductView(p.id);
+      });
+    });
+  } catch(e) { console.error('loadSiteProducts error:', e); }
+}
+
+function addProductToCart(btn, productId) {
+  var card = btn.closest('.pc');
+  if(!card) return;
+  var name = card.querySelector('.pname').textContent;
+  var tag = card.querySelector('.ptag').textContent;
+  var priceStr = card.querySelector('.pprice').textContent.replace(/[^0-9]/g,'');
+  var price = parseInt(priceStr)||0;
+  var imgEl = card.querySelector('.pslide.active') || card.querySelector('.pci');
+  var img = imgEl ? imgEl.src : '';
+  var ex = cart.find(function(i){ return i.name===name; });
+  if(ex){ ex.qty++; } else { cart.push({name:name,tag:tag,price:price,img:img,qty:1,productId:productId}); }
+  saveCart(); renderCart(); openCart();
+  var orig=btn.innerHTML; btn.innerHTML='&#10003; Added!'; btn.style.opacity='.7';
+  setTimeout(function(){ btn.innerHTML=orig; btn.style.opacity='1'; },1600);
+}
+
+async function trackProductView(productId) {
+  try {
+    await sb.from('product_views').insert([{product_id: productId, viewed_at: new Date().toISOString()}]);
+  } catch(e) {}
+}
+
+function openProductQV(productId) {
+  var p = allProducts.find(function(p){ return p.id===productId; });
+  if(!p){ openQV(); return; }
+  var mainImg = document.getElementById('qvMain');
+  if(mainImg && p.images && p.images[0]) mainImg.src = p.images[0];
+  document.querySelector('.qv-name').innerHTML = p.name;
+  document.querySelector('.qv-price').innerHTML = '&#8377;'+p.price.toLocaleString('en-IN');
+  document.querySelector('.qv-desc').textContent = p.description||'';
+  document.getElementById('qvModal').classList.add('open');
+  document.getElementById('bd').classList.add('open');
+}
+
+// ===== COUPON APPLY IN CHECKOUT =====
+window._appliedCoupon = null;
+async function applyCoupon(code) {
+  if(!code){ showToast('Enter coupon code','err'); return; }
+  try {
+    var {data:coupon} = await sb.from('coupons').select('*').eq('code',code.toUpperCase()).eq('is_active',true).single();
+    if(!coupon){ showToast('Invalid coupon code','err'); return; }
+    if(coupon.expires_at && new Date(coupon.expires_at) < new Date()){ showToast('Coupon expired','err'); return; }
+    if(coupon.used_count >= coupon.max_uses){ showToast('Coupon limit reached','err'); return; }
+    var total = cart.reduce(function(s,i){ return s+i.price*i.qty; },0);
+    if(total < coupon.min_order_amount){ showToast('Min order ₹'+coupon.min_order_amount+' required','err'); return; }
+    window._appliedCoupon = coupon;
+    var discount = coupon.discount_type==='percent' ? Math.round(total*coupon.discount_value/100) : coupon.discount_value;
+    showToast('Coupon applied! ₹'+discount+' off ✦');
+    updateCheckoutTotal();
+  } catch(e){ showToast('Invalid coupon','err'); }
+}
+
+function updateCheckoutTotal() {
+  var total = cart.reduce(function(s,i){ return s+i.price*i.qty; },0);
+  var discount = 0;
+  if(window._appliedCoupon) {
+    discount = window._appliedCoupon.discount_type==='percent' ? Math.round(total*window._appliedCoupon.discount_value/100) : window._appliedCoupon.discount_value;
+  }
+  var final = Math.max(0, total - discount);
+  var el = document.getElementById('coTotal');
+  if(el) el.innerHTML = '&#8377;'+final.toLocaleString('en-IN') + (discount>0?' <span style="font-size:.7rem;color:rgba(0,200,122,.8);">(-₹'+discount+')</span>':'');
+  return final;
+}
+
+// Init: Load products from Supabase on page load
+window.addEventListener('load', function(){ setTimeout(loadSiteProducts, 1000); });
+
 
 // ===== INIT =====
 initAuth();
