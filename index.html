@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#04030a"/>
 <link rel="icon" type="image/png" href="/public/logo.png"/>
 <link rel="apple-touch-icon" href="/public/logo.png"/>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin/>
 <link rel="dns-prefetch" href="//images.unsplash.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400&display=swap" rel="stylesheet"/>
@@ -1310,6 +1310,8 @@ footer{background:#020109;padding:60px 50px 36px;border-top:1px solid rgba(200,2
 
 
 <script>
+window.addEventListener('load',function(){
+
 
 window.onerror=function(){return true;};
 
@@ -2424,6 +2426,8 @@ window.addEventListener('load', function(){ setTimeout(loadSiteProducts, 1000); 
 // ===== INIT v2.1 =====
 // v2.0 - Admin Panel with Products Management
 initAuth();
+
+});
 </script>
 
 </body>
