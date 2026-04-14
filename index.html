@@ -476,7 +476,7 @@ footer{background:#020109;padding:60px 50px 36px;border-top:1px solid rgba(200,2
 @keyframes floatJ{0%{opacity:0;transform:translateY(0) rotate(0deg);}7%{opacity:.85;}88%{opacity:.3;}100%{opacity:0;transform:translateY(-106vh) rotate(400deg);}}
 @keyframes popIn{0%{transform:scale(0) rotate(-20deg);}70%{transform:scale(1.12) rotate(5deg);}100%{transform:scale(1) rotate(0);}}
 </style>
-<script>/* v2.1 */</script>
+<script>window.__jsErrors=[];window.onerror=function(msg,src,line,col,err){window.__jsErrors.push(msg+' L'+line);return false;};</script>
 </head>
 <body>
 <div id="cur"></div>
@@ -1310,10 +1310,8 @@ footer{background:#020109;padding:60px 50px 36px;border-top:1px solid rgba(200,2
 
 
 <script>
-document.addEventListener('DOMContentLoaded',function(){
 
-
-window.onerror=function(){return true;};
+// errors enabled
 
 // ===== SUPABASE INIT =====
 const SUPA_URL = 'https://kvpevutvvnpddqdvzbwu.supabase.co';
@@ -1334,7 +1332,7 @@ document.querySelectorAll('a,button,.pc,.gi').forEach(function(el){
 // ===== PRELOADER =====
 function hideLoader(){var p=document.getElementById('pl');if(p)p.classList.add('hide');}
 setTimeout(hideLoader,900);
-window.addEventListener('load',function(){setTimeout(hideLoader,400);});
+document.addEventListener('DOMContentLoaded',function(){setTimeout(hideLoader,400);});
 
 // ===== NAV SCROLL =====
 window.addEventListener('scroll',function(){document.getElementById('nav').classList.toggle('scrolled',window.scrollY>60);});
@@ -2034,7 +2032,7 @@ function renderProductsGrid(products) {
     var statusLabel = p.is_active ? 'Active' : 'Inactive';
     var discount = p.original_price > p.price ? Math.round((1 - p.price/p.original_price)*100)+'% OFF' : '';
     return '<div class="admin-product-card">'
-      + (img ? '<img class="admin-product-img" src="'+img+'" onerror="this.style.display:\"none\"">' : '<div class="admin-product-img" style="display:flex;align-items:center;justify-content:center;color:rgba(248,244,255,.2);font-size:2rem;">💎</div>')
+      + (img ? '<img class="admin-product-img" src="'+img+'" onerror="this.style.display=\"none\"">' : '<div class="admin-product-img" style="display:flex;align-items:center;justify-content:center;color:rgba(248,244,255,.2);font-size:2rem;">💎</div>')
       + '<div class="admin-product-body">'
       + '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">'
       + '<div style="font-family:Cormorant,serif;font-size:1rem;">' + p.name + '</div>'
@@ -2423,11 +2421,8 @@ function updateCheckoutTotal() {
 window.addEventListener('load', function(){ setTimeout(loadSiteProducts, 1000); });
 
 
-// ===== INIT v2.1 =====
-// v2.0 - Admin Panel with Products Management
+// ===== INIT =====
 initAuth();
-
-});
 </script>
 
 </body>
