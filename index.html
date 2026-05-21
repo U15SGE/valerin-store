@@ -1750,8 +1750,8 @@ async function doLogin(e){
 
 // OTP PANEL
 function showOTPPanel(mode, email, devOTP){
-  document.getElementById('loginPanel').style.display:\"none\";
-  document.getElementById('signupPanel').style.display:\"none\";
+  document.getElementById('loginPanel').style.display='none';
+  document.getElementById('signupPanel').style.display='none';
   document.getElementById('otpPanel').style.display='block';
   document.getElementById('otp_email_show').textContent=email;
   window._otpMode = mode;
@@ -2163,7 +2163,7 @@ async function deleteProduct(id, name) {
 
 // ===== BULK UPLOAD =====
 function openBulkUpload() { document.getElementById('bulkUploadModal').style.display='block'; }
-function closeBulkUpload() { document.getElementById('bulkUploadModal').style.display:\"none\"; }
+function closeBulkUpload() { document.getElementById('bulkUploadModal').style.display='none'; }
 
 async function processBulkUpload() {
   var json = document.getElementById('bulkJsonInput').value.trim();
@@ -2266,7 +2266,7 @@ async function loadAdminCoupons() {
 }
 
 function openCouponForm() { document.getElementById('couponFormModal').style.display='block'; }
-function closeCouponForm() { document.getElementById('couponFormModal').style.display:\"none\"; }
+function closeCouponForm() { document.getElementById('couponFormModal').style.display='none'; }
 
 async function saveCoupon() {
   var code = (document.getElementById('cp_code').value||'').trim().toUpperCase();
