@@ -38,8 +38,8 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 @media(max-width:768px){.jf{display:none!important;}}
 
 /* PRELOADER */
-#pl{position:fixed;inset:0;z-index:99999;background:radial-gradient(ellipse at 50% 40%,#1a1a22,#04030a 65%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;animation:plFadeOut 0.6s ease 1.2s forwards;}
-
+#pl{position:fixed;inset:0;z-index:99999;background:radial-gradient(ellipse at 50% 40%,#1a1a22,#04030a 65%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;transition:opacity .5s,visibility .5s;}
+#pl.hide{opacity:0;visibility:hidden;pointer-events:none;}
 .pl-logo{width:88px;height:88px;animation:plSpin .8s ease-out 1 forwards;}
 .pl-name{font-family:'Cormorant',serif;font-size:1.7rem;font-weight:300;letter-spacing:.6em;text-transform:uppercase;background:linear-gradient(90deg,#8a9099,#e8eaee,#fff,#e8eaee,#8a9099);background-size:300%;animation:shimmer 2s linear infinite;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
 .pl-bar{width:140px;height:1px;background:rgba(200,205,214,.1);position:relative;overflow:hidden;}
@@ -464,7 +464,6 @@ footer{background:#020109;padding:60px 50px 36px;border-top:1px solid rgba(200,2
 
 /* KEYFRAMES */
 @keyframes plSpin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
-@keyframes plFadeOut{0%{opacity:1;visibility:visible;}100%{opacity:0;visibility:hidden;pointer-events:none;}}
 @keyframes shimmer{0%{background-position:0%;}100%{background-position:200%;}}
 @keyframes sweep{from{left:-100%;}to{left:100%;}}
 @keyframes starIn{0%{opacity:0;transform:scale(.35) rotate(-100deg);}100%{opacity:1;transform:scale(1) rotate(0);}}
@@ -1394,7 +1393,7 @@ function renderCart(){
   if(tv)tv.innerHTML='&#8377;'+total.toLocaleString('en-IN');
   if(cart.length===0){
     body.innerHTML='<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:280px;gap:14px;color:rgba(248,244,255,.22);text-align:center;"><div style="font-size:2.2rem;">&#128717;</div><div style="font-family:Cormorant,serif;font-size:1.05rem;font-style:italic;">Your cart is empty</div><a href="#women" onclick="closeCart()" style="margin-top:8px;font-family:Syne,sans-serif;font-size:.58rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#04030a;background:linear-gradient(135deg,#8a9099,#fff);padding:11px 24px;text-decoration:none;clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);">Shop Now</a></div>';
-    if(foot)foot.style.display:\"none\";
+    if(foot)foot.style.display='none';
     return;
   }
   if(foot)foot.style.display='block';
@@ -1452,7 +1451,7 @@ function closeCheckout(){document.getElementById('coModal').classList.remove('op
 function selPay(el,method){
   document.querySelectorAll('.pay-method').forEach(function(m){m.classList.remove('sel');});
   el.classList.add('sel');
-  ['payCard','payUPI','payNB','payCOD'].forEach(function(id){var e2=document.getElementById(id);if(e2)e2.style.display:\"none\";});
+  ['payCard','payUPI','payNB','payCOD'].forEach(function(id){var e2=document.getElementById(id);if(e2)e2.style.display='none';});
   var map={card:'payCard',upi:'payUPI',netbanking:'payNB',cod:'payCOD'};
   if(map[method]){var t=document.getElementById(map[method]);if(t)t.style.display='block';}
 }
@@ -1959,7 +1958,7 @@ setInterval(function(){
 
 function showAdminSection(section) {
   adminCurrentSection = section;
-  document.querySelectorAll('[id^="adminSection_"]').forEach(function(el){ el.style.display:\"none\"; });
+  document.querySelectorAll('[id^="adminSection_"]').forEach(function(el){ el.style.display='none'; });
   var target = document.getElementById('adminSection_' + section);
   if(target) target.style.display = 'block';
   document.querySelectorAll('.admin-nav-tab').forEach(function(t){ t.classList.toggle('active', t.dataset.section === section); });
