@@ -1330,10 +1330,11 @@ document.querySelectorAll('a,button,.pc,.gi').forEach(function(el){
 });
 
 // ===== PRELOADER =====
-function hideLoader(){var p=document.getElementById('pl');if(p){p.classList.add('hide');setTimeout(function(){p.style.display='none';},600);}}
-setTimeout(hideLoader,1500);
-document.addEventListener('DOMContentLoaded',function(){setTimeout(hideLoader,800);});
-window.addEventListener('load',function(){setTimeout(hideLoader,100);});
+function hideLoader(){var p=document.getElementById('pl');if(p){p.style.opacity='0';p.style.visibility='hidden';p.style.pointerEvents='none';setTimeout(function(){p.style.display='none';},400);}}
+hideLoader();
+setTimeout(hideLoader,200);
+document.addEventListener('DOMContentLoaded',hideLoader);
+window.addEventListener('load',hideLoader);
 
 // ===== NAV SCROLL =====
 window.addEventListener('scroll',function(){document.getElementById('nav').classList.toggle('scrolled',window.scrollY>60);});
