@@ -38,8 +38,8 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 @media(max-width:768px){.jf{display:none!important;}}
 
 /* PRELOADER */
-#pl{position:fixed;inset:0;z-index:99999;background:radial-gradient(ellipse at 50% 40%,#1a1a22,#04030a 65%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;transition:opacity .5s,visibility .5s;}
-#pl.hide{opacity:0;visibility:hidden;pointer-events:none;}
+#pl{position:fixed;inset:0;z-index:99999;background:radial-gradient(ellipse at 50% 40%,#1a1a22,#04030a 65%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;animation:plFadeOut 0.6s ease 1.2s forwards;}
+
 .pl-logo{width:88px;height:88px;animation:plSpin .8s ease-out 1 forwards;}
 .pl-name{font-family:'Cormorant',serif;font-size:1.7rem;font-weight:300;letter-spacing:.6em;text-transform:uppercase;background:linear-gradient(90deg,#8a9099,#e8eaee,#fff,#e8eaee,#8a9099);background-size:300%;animation:shimmer 2s linear infinite;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
 .pl-bar{width:140px;height:1px;background:rgba(200,205,214,.1);position:relative;overflow:hidden;}
@@ -464,6 +464,7 @@ footer{background:#020109;padding:60px 50px 36px;border-top:1px solid rgba(200,2
 
 /* KEYFRAMES */
 @keyframes plSpin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+@keyframes plFadeOut{0%{opacity:1;visibility:visible;}100%{opacity:0;visibility:hidden;pointer-events:none;}}
 @keyframes shimmer{0%{background-position:0%;}100%{background-position:200%;}}
 @keyframes sweep{from{left:-100%;}to{left:100%;}}
 @keyframes starIn{0%{opacity:0;transform:scale(.35) rotate(-100deg);}100%{opacity:1;transform:scale(1) rotate(0);}}
