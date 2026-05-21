@@ -2047,9 +2047,9 @@ function renderProductsGrid(products) {
       + '</div>'
       + '<div style="font-size:.58rem;color:rgba(248,244,255,.35);margin-bottom:12px;">Stock: '+p.stock_quantity+' | Views: '+(p.view_count||0)+'</div>'
       + '<div style="display:flex;gap:8px;flex-wrap:wrap;">'
-      + '<button class="admin-btn-edit" onclick="editProduct(''+p.id+'')">✏️ Edit</button>'
-      + '<button class="admin-btn-edit" onclick="toggleProductStatus(''+p.id+'','+p.is_active+')">'+(p.is_active?'🔴 Deactivate':'🟢 Activate')+'</button>'
-      + '<button class="admin-btn-danger" onclick="deleteProduct(''+p.id+'',''+p.name.replace(/'/g,"\'")+'')" >🗑️ Delete</button>'
+      + '<button class="admin-btn-edit" onclick="editProduct(\x27'+p.id+'\x27)">✏️ Edit</button>'
+      + '<button class="admin-btn-edit" onclick="toggleProductStatus(\x27'+p.id+'\x27,'+p.is_active+')">'+(p.is_active?'🔴 Deactivate':'🟢 Activate')+'</button>'
+      + '<button class="admin-btn-danger" onclick="deleteProduct(\x27'+p.id+'\x27,\x27'+p.name.replace(/[^a-zA-Z0-9 ]/g,'')+'\x27)">🗑️ Delete</button>'
       + '</div></div></div>';
   }).join('');
 }
